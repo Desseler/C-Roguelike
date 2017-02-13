@@ -1,0 +1,5 @@
+By Trevor Luster
+
+This project is an implementation of Conway's Game of Life. It uses loops and 2D char arrays to represent a board of alive and dead cells. The game runs at 12 frames per second and each time is an evolution from the previous frame.
+
+The source code is in file.c To compile, run the command "make life"

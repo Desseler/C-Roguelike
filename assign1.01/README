@@ -1,0 +1,8 @@
+Made by Trevor Luster
+
+This is a dungeon generator written in C for assignment 1.01 for CS327.
+
+To use, compile source code:
+$ make dungeon
+Then run compiled binary. Pass in a seed as well:
+$ ./dungeon [seed]

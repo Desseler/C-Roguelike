@@ -1,0 +1,2 @@
+	1-17: Started project. Implemented 2D array, created array of alive and dead cells from terminal input and printed to console
+	1-18: Finished project. Implemented Life rules, check for neighboring cell count, continuously prints to terminal the changes and evolution of the cells.
