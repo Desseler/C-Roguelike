@@ -1,0 +1,18 @@
+C Program made by Trevor Luster for Computer Science 327
+
+heap.h, macros.h, heap.c, rlg327.c all created by Jeremy Sheaffer.
+
+rlg327.c code merged with pth327.c
+
+Source files: pth327.c, heap.c
+
+
+
+To make, compile with command
+make pth327
+
+To run, use command
+./pth327
+
+To clean, clean with command
+make clean

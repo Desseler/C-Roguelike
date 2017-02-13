@@ -1,0 +1,5 @@
+2-2-17: Created project files and meta files
+2-6-17: Added 1.02 solution to working directory.
+2-7-17: Merged Jeremy's rlg327.c solution with pth327.c. Changed Jeremy's Makefile to work with new source file. Began implementing Jeremy's tunneling Dijkstra's algorithm to work for path finding.
+2-8-17: finishing algorithm implementation.	
+2-9-17: Bug testing. Finished assignment. No PC switch implemented.

@@ -1,0 +1,18 @@
+Made by Trevor Luster
+
+C program for assignment 1.02 for ComS 327. Implements dungeon loading and saving.
+
+To compile, run:
+
+make dls327
+
+To clean, run:
+
+make clean
+
+There are 4 ways to run the compile program
+
+./dls327
+./dls327 --save
+./dls327 --load
+./dls327 --save --load/--load save (Order doesn't matter)
