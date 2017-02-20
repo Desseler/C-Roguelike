@@ -1,4 +1,4 @@
-CC = gcc
+¥CC = gcc
 CXX = g++
 ECHO = echo
 RM = rm -f
@@ -8,13 +8,13 @@ CXXFLAGS = -Wall -ggdb -funroll-loops
 LDFLAGS = 
 
 BIN = pcm327
-OBJS = pcm327.o heap.o
+OBJS = pcm327.o heap.o dungeon.o path.o utils.o
 
 all: $(BIN) etags
 
 $(BIN): $(OBJS)
 	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
+	@$(CXX) $^ -o $@ $(LDFLAGS)
 
 -include $(OBJS:.o=.d)
 
