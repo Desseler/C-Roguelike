@@ -19,6 +19,33 @@ void usage(char *name)
  * Start Trevor's code
  */
 
+int line_of_sight(dungeon_t *d, int y, int x)
+{
+  int pc_room;
+  int room_count = sizeof(d->rooms)/sizeof(room);
+  for(int i = 0; i < room_count; i++)
+    {
+      if(d->rooms[i].position[dim_y]                          <= d->pc.position[dim_y] &&
+	 d->rooms[i].position[dim_y] + d-rooms[i].size[dim_y] >= d->pc.position[dim_y] &&
+	 d->rooms[i].position[dim_x]                          <= d->pc.position[dim_x] &&
+	 d->rooms[i].position[dim_x] + d-rooms[i].size[dim_x] >= d->pc.position[dim_x])
+	{
+	  if(d->rooms[i].position[dim_y]                          <= y &&
+	     d->rooms[i].position[dim_y] + d-rooms[i].size[dim_y] >= y &&
+	     d->rooms[i].position[dim_x]                          <= y &&
+	     d->rooms[i].position[dim_x] + d-rooms[i].size[dim_x] >= y)
+	    {
+	      return 1;
+	    }
+	  else
+	    {
+	      return 0;
+	    }
+	}
+    }
+  return 0;
+}
+
 void move(dungeon_t *d, pair_t p, monster_t *m)
 {
   if(d->pc.position == p)
@@ -40,12 +67,100 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
       d->pc.position[dim_y] = y;
       d->pc.position[dim_x] = x;
       d->monster_map[y][x] = '@';
-
+      
       return 1;
     } else {
     switch (d->monster_map[p[dim_y]][p[dim_x]])
       {
       case '0': //No Traits.
+        if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+	  {
+	    int y;
+	    int x;
+	    if(d->pc.position[dim_y] > p[dim_y])
+	      {
+		y = 1;
+	      }
+	    else
+	      {
+		if(d->pc.position[dim_y] < p[dim_y])
+		  {
+		    y = -1;
+		  }
+		else
+		  {
+		    y = 0;
+		  }
+	      }
+	    if(d->pc.position[dim_x] > p[dim_x])
+	      {
+		x = 1;
+	      }
+	    else
+	      {
+		if(d->pc.position[dim_x] < p[dim_x])
+		  {
+		    x = -1;
+		  }
+		else
+		  {
+		    x = 0;
+		  }
+	      }
+	    if(mapxy(x, y) >= ter_floor)
+	      {
+		d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		d->monster_map[y][x] = '8';
+		m->position[dim_y] = y;
+		m->position[dim_x] = x;
+		
+		return 1;
+	      }
+	    else
+	      {
+		if(mapxy(x, p[dim_y]) >= ter_floor)
+		  {
+		    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		    d->monster_map[p[dim_y]][x] = '8';
+		    m->position[dim_y] = p[dim_y];
+		    m->position[dim_x] = x;
+		    
+		    return 1;
+		  }
+		else
+		  {
+		    if(mapxy(p[dim_x], y) >= ter_floor)
+		      {
+			d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+			d->monster_map[y][p[dim_x]] = '8';
+			m->position[dim_y] = y;
+			m->position[dim_x] = p[dim_x];
+		      }
+		    return 1;
+		  }
+	      }
+	  }
+	else
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) >= ter_floor)
+		  {
+		    move = 1;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = '8';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	    
+	    return 1;
+	  }
 	break;
 
       case '1': //Intelligence
@@ -58,6 +173,107 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 	break;
 
       case '4': //Tunneling
+	if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+	  {
+	    int y;
+	    int x;
+	    if(d->pc.position[dim_y] > p[dim_y])
+	      {
+		y = 1;
+	      }
+	    else
+	      {
+		if(d->pc.position[dim_y] < p[dim_y])
+		  {
+		    y = -1;
+		  }
+		else
+		  {
+		    y = 0;
+		  }
+	      }
+	    if(d->pc.position[dim_x] > p[dim_x])
+	      {
+		x = 1;
+	      }
+	    else
+	      {
+		if(d->pc.position[dim_x] < p[dim_x])
+		  {
+		    x = -1;
+		  }
+		else
+		  {
+		    x = 0;
+		  }
+	      }
+	    if(mapxy(x, y) >= ter_floor)
+	      {
+		d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		d->monster_map[y][x] = '8';
+		m->position[dim_y] = y;
+		m->position[dim_x] = x;
+
+		return 1;
+	      }
+	    else
+	      {
+		if(mapxy(x, p[dim_y]) >= ter_floor)
+		  {
+		    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		    d->monster_map[p[dim_y]][x] = '8';
+		    m->position[dim_y] = p[dim_y];
+		    m->position[dim_x] = x;
+
+		    return 1;
+		  }
+		else
+		  {
+		    if(mapxy(p[dim_x], y) >= ter_floor)
+		      {
+			d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+			d->monster_map[y][p[dim_x]] = '8';
+			m->position[dim_y] = y;
+			m->position[dim_x] = p[dim_x];
+		      }
+		    return 1;
+		  }
+	      }
+	  }
+	else
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) != ter_wall_immutable)
+		  {
+		    move = 1;
+		  }
+	      }
+	    if(mapxy(x, y) == ter_wall)
+	      {
+		if(hardnessxy(x, y) > 85)
+		  {
+		    hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+		    return 1;
+		  }
+		else
+		  {
+		    hardnessxy(x, y) = 0;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = '4';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+
+	    return 1;
+	  }
 	break;
 
       case '5': //Tunneling & Intelligence
@@ -88,9 +304,100 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 	    d->monster_map[y][x] = '8';
 	    m->position[dim_y] = y;
 	    m->position[dim_x] = x;
-	    
-	  } else {
-	}
+
+	    return 1;
+	  }
+	else
+	  {
+	    if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+	      {
+		int y;
+		int x;
+		if(d->pc.position[dim_y] > p[dim_y])
+		  {
+		    y = 1;
+		  }
+		else
+		  {
+		    if(d->pc.position[dim_y] < p[dim_y])
+		      {
+			y = -1;
+		      }
+		    else
+		      {
+			y = 0;
+		      }
+		  }
+		if(d->pc.position[dim_x] > p[dim_x])
+		  {
+		    x = 1;
+		  }
+		else
+		  {
+		    if(d->pc.position[dim_x] < p[dim_x])
+		      {
+			x = -1;
+		      }
+		    else
+		      {
+			x = 0;
+		      }
+		  }
+		if(mapxy(x, y) >= ter_floor)
+		  {
+		    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		    d->monster_map[y][x] = '8';
+		    m->position[dim_y] = y;
+		    m->position[dim_x] = x;
+		    
+		    return 1;
+		  }
+		else
+		  {
+		    if(mapxy(x, p[dim_y]) >= ter_floor)
+		      {
+			d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+			d->monster_map[p[dim_y]][x] = '8';
+			m->position[dim_y] = p[dim_y];
+			m->position[dim_x] = x;
+			
+			return 1;
+		      }
+		    else
+		      {
+			if(mapxy(p[dim_x], y) >= ter_floor)
+			  {
+			    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+			    d->monster_map[y][p[dim_x]] = '8';
+			    m->position[dim_y] = y;
+			    m->position[dim_x] = p[dim_x];
+			  }
+			return 1;
+		      }
+		  }
+	      }
+	    else
+	      {
+		int y;
+		int x;
+		int move = 0;
+		while(move == 0)
+		  {
+		    y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		    x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		    if (mapxy(x, y) >= ter_floor)
+		      {
+			move = 1;
+		      }
+		  }
+		d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+		d->monster_map[y][x] = '8';
+		m->position[dim_y] = y;
+		m->position[dim_x] = x;
+
+		return 1;
+	      }
+	  }
 	break;
 
       case '9': //Erratic & Intelligence
@@ -116,7 +423,7 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 	}
 	break;
 
-      case 'A': //Erratic & Telepathy
+      case 'a': //Erratic & Telepathy
 	if(rand() % 2 == 0)
 	  {
 	    int y;
@@ -139,7 +446,7 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 	}
 	break;
 
-      case 'B': //Erratic & Telepathy & Intelligence
+      case 'b': //Erratic & Telepathy & Intelligence
 	if(rand() % 2 == 0)
 	  {
 	    int y;
@@ -162,16 +469,153 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 	}
 	break;
 
-      case 'C': //Erratic & Tunneling
+      case 'c': //Erratic & Tunneling
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) != ter_wall_immutable)
+		  {
+		    move = 1;
+		  }
+	      }
+	    if(mapxy(x, y) == ter_wall)
+	      {
+		if(hardnessxy(x, y) > 85)
+		  {
+		    hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+		    return 1;
+		  }
+		else
+		  {
+		    hardnessxy(x, y) = 0;		  
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'B';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
 	break;
 
-      case 'D': //Erratic & Tunneling & Intelligence
+      case 'd': //Erratic & Tunneling & Intelligence
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) != ter_wall_immutable)
+		  {
+		    move = 1;
+		  }
+	      }
+	    if(mapxy(x, y) == ter_wall)
+	      {
+		if(hardnessxy(x, y) > 85)
+		  {
+		    hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+		    return 1;
+		  }
+		else
+		  {
+		    hardnessxy(x, y) = 0;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'B';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
+	
 	break;
 
-      case 'E': //Erratic & Tunneling & Telepathy
+      case 'e': //Erratic & Tunneling & Telepathy
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) != ter_wall_immutable)
+		  {
+		    move = 1;
+		  }
+	      }
+	    if(mapxy(x, y) == ter_wall)
+	      {
+		if(hardnessxy(x, y) > 85)
+		  {
+		    hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+		    return 1;
+		  }
+		else
+		  {
+		    hardnessxy(x, y) = 0;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'B';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
+	
 	break;
 
-      case 'F': //Erratic & Tunneling & Telepathy & Intelligence
+      case 'f': //Erratic & Tunneling & Telepathy & Intelligence
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) != ter_wall_immutable)
+		  {
+		    move = 1;
+		  }
+	      }
+	    if(mapxy(x, y) == ter_wall)
+	      {
+		if(hardnessxy(x, y) > 85)
+		  {
+		    hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+		    return 1;
+		  }
+		else
+		  {
+		    hardnessxy(x, y) = 0;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'B';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+
+	    return 1;
+	  } else {
+	}
+	
 	break;
       }
   }
@@ -180,6 +624,54 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
 void add_monsters(dungeon_t *d, int monster_count, heap_t *h)
 {
   heap_init(&h, monster_cmp, NULL);
+  for(int i = 0; i < monster_count; i++)
+    {
+      int x = 0;
+      int y = 0;
+      while(mapxy(x, y) < ter_floor)
+	{
+	  int x = rand() % (DUNGEON_X - 1) + 1;
+	  int y = rand() % (DUNGEON_Y - 1) + 1;
+	}
+      char property = rand() % 16;
+      switch (property)
+	{
+	case '10':
+	  property = 'a';
+	  break;
+
+	case '11':
+	  property = 'b';
+	  break;
+
+	case '12':
+	  property = 'c';
+	  break;
+
+	case '13':
+	  property = 'd';
+	  break;
+
+	case '14':
+	  property = 'e';
+	  break;
+
+	case '15':
+	  property = 'f';
+	  break;
+
+	default:
+	  break;
+	}
+      d->monster_map[y][x] = property;
+      monster_t * monster = (monster_t *) malloc(sizeof(monster_t));
+      monster.position[dim_y] = y;
+      monster.position[dim_x] = x;
+      monster.properties = property;
+      monster.speed = rand() % (20 + 1 - 5) + 5;
+      monster.alive = 1;
+      heap_insert(&h, &monster);
+    }
 }
 
 /*
