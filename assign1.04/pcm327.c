@@ -177,6 +177,11 @@ void move(dungeon_t *d, pair_t p, monster_t *m)
   }
 }
 
+void add_monsters(dungeon_t *d, int monster_count, heap_t *h)
+{
+  heap_init(&h, monster_cmp, NULL);
+}
+
 /*
  * End Trevor's code
  */
