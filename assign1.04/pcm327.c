@@ -15,6 +15,35 @@ void usage(char *name)
   exit(-1);
 }
 
+/*
+ * Start Trevor's code
+ */
+
+void pcmove(dungeon_t *d)
+{
+  srand(time(NULL));
+  int y;
+  int x;
+  int move = 0;
+  while(move == 0)
+    {
+      y = d->pc.position[dim_y] + (rand() % ((d->pc.position[dim_y] + 1) + 1 - (d->pc.position[dim_y] - 1)) + (d->pc.position[dim_y] - 1));
+      x = d->pc.position[dim_x] + (rand() % ((d->pc.position[dim_x] + 1) + 1 - (d->pc.position[dim_x] - 1)) + (d->pc.position[dim_x] - 1));
+      if (mapxy(x, y) >= ter_floor)
+	{
+	  move = 1;
+	}
+    }
+  d->pc.position[dim_y] = y;
+  d->pc.position[dim_x] = x;
+}
+
+
+
+/*
+ * End Trevor's code
+ */
+
 int main(int argc, char *argv[])
 {
   dungeon_t d;
