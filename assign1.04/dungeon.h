@@ -32,6 +32,14 @@ typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_floor_hall,
 } terrain_type_t;
 
+typedef struct monster {
+  char properties;
+  uint8 speed;
+  uint8 alive;
+  pair_t position;
+  pc_t pc;
+} monster_t;
+
 typedef struct room {
   pair_t position;
   pair_t size;
@@ -56,6 +64,7 @@ typedef struct dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
+  char *monster_map[DUNGEON_Y][DUNGEON_X];
   pc_t pc;
 } dungeon_t;
 

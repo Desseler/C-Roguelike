@@ -19,26 +19,83 @@ void usage(char *name)
  * Start Trevor's code
  */
 
-void pcmove(dungeon_t *d)
+void move(dungeon_t *d, pair_t p)
 {
-  srand(time(NULL));
-  int y;
-  int x;
-  int move = 0;
-  while(move == 0)
+  if(d->pc.position == p)
     {
-      y = d->pc.position[dim_y] + (rand() % ((d->pc.position[dim_y] + 1) + 1 - (d->pc.position[dim_y] - 1)) + (d->pc.position[dim_y] - 1));
-      x = d->pc.position[dim_x] + (rand() % ((d->pc.position[dim_x] + 1) + 1 - (d->pc.position[dim_x] - 1)) + (d->pc.position[dim_x] - 1));
-      if (mapxy(x, y) >= ter_floor)
+      srand(time(NULL));
+      int y;
+      int x;
+      int move = 0;
+      while(move == 0)
 	{
-	  move = 1;
+	  y = d->pc.position[dim_y] + (rand() % ((d->pc.position[dim_y] + 1) + 1 - (d->pc.position[dim_y] - 1)) + (d->pc.position[dim_y] - 1));
+	  x = d->pc.position[dim_x] + (rand() % ((d->pc.position[dim_x] + 1) + 1 - (d->pc.position[dim_x] - 1)) + (d->pc.position[dim_x] - 1));
+	  if (mapxy(x, y) >= ter_floor)
+	    {
+	      move = 1;
+	    }
 	}
-    }
-  d->pc.position[dim_y] = y;
-  d->pc.position[dim_x] = x;
+      free(d->monster_map[p[dim_y]][p[dim_x]]);
+      d->pc.position[dim_y] = y;
+      d->pc.position[dim_x] = x;
+      d->monster_map[y][x] = '@';
+
+      return 1;
+    } else {
+    switch (d->monster_map[p[dim_y]][p[dim_x]])
+      {
+      case '0': //No Traits.
+	break;
+
+      case '1': //Intelligence
+	break;
+
+      case '2': //Telepathy
+	break;
+
+      case '3': //Telepathy & Intelligence
+	break;
+
+      case '4': //Tunneling
+	break;
+
+      case '5': //Tunneling & Intelligence
+	break;
+
+      case '6': //Tunneling & Telepathy
+	break;
+
+      case '7': //Tunneling & Telepathy & Intelligence
+	break;
+
+      case '8': //Erratic
+	break;
+
+      case '9': //Erratic & Intelligence
+	break;
+
+      case 'a': //Erratic & Telepathy
+	break;
+
+      case 'b': //Erratic & Telepathy & Intelligence
+	break;
+
+      case 'c': //Erratic & Tunneling
+	break;
+
+      case 'd': //Erratic & Tunneling & Intelligence
+	break;
+
+      case 'e': //Erratic & Tunneling & Telepathy
+	break;
+
+      case 'f': //Erratic & Tunneling & Telepathy & Intelligence
+	break;
+      }
+  }
+  
 }
-
-
 
 /*
  * End Trevor's code

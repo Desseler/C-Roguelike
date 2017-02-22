@@ -606,9 +606,8 @@ void render_dungeon(dungeon_t *d)
 
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (p[dim_x] ==  d->pc.position[dim_x] &&
-          p[dim_y] ==  d->pc.position[dim_y]) {
-        putchar('@');
+      if (d->monster_map[p[dim_y]][p[dim_x]] != NULL) {
+        putchar(d->monster_map[p[dim_y]][p[dim_x]]);
       } else {
         switch (mappair(p)) {
         case ter_wall:
