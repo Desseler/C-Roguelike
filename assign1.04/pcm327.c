@@ -19,7 +19,7 @@ void usage(char *name)
  * Start Trevor's code
  */
 
-void move(dungeon_t *d, pair_t p)
+void move(dungeon_t *d, pair_t p, monster_t *m)
 {
   if(d->pc.position == p)
     {
@@ -36,7 +36,7 @@ void move(dungeon_t *d, pair_t p)
 	      move = 1;
 	    }
 	}
-      free(d->monster_map[p[dim_y]][p[dim_x]]);
+      d->monster_map[p[dim_y]][p[dim_x]] = NULL;
       d->pc.position[dim_y] = y;
       d->pc.position[dim_x] = x;
       d->monster_map[y][x] = '@';
@@ -70,31 +70,111 @@ void move(dungeon_t *d, pair_t p)
 	break;
 
       case '8': //Erratic
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) >= ter_floor)
+		  {
+		    move = 1;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = '8';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	    
+	  } else {
+	}
 	break;
 
       case '9': //Erratic & Intelligence
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) >= ter_floor)
+		  {
+		    move = 1;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = '9';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
 	break;
 
-      case 'a': //Erratic & Telepathy
+      case 'A': //Erratic & Telepathy
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) >= ter_floor)
+		  {
+		    move = 1;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'A';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
 	break;
 
-      case 'b': //Erratic & Telepathy & Intelligence
+      case 'B': //Erratic & Telepathy & Intelligence
+	if(rand() % 2 == 0)
+	  {
+	    int y;
+	    int x;
+	    int move = 0;
+	    while(move == 0)
+	      {
+		y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		if (mapxy(x, y) >= ter_floor)
+		  {
+		    move = 1;
+		  }
+	      }
+	    d->monster_map[p[dim_y]][p[dim_x]] = NULL;
+	    d->monster_map[y][x] = 'B';
+	    m->position[dim_y] = y;
+	    m->position[dim_x] = x;
+	  } else {
+	}
 	break;
 
-      case 'c': //Erratic & Tunneling
+      case 'C': //Erratic & Tunneling
 	break;
 
-      case 'd': //Erratic & Tunneling & Intelligence
+      case 'D': //Erratic & Tunneling & Intelligence
 	break;
 
-      case 'e': //Erratic & Tunneling & Telepathy
+      case 'E': //Erratic & Tunneling & Telepathy
 	break;
 
-      case 'f': //Erratic & Tunneling & Telepathy & Intelligence
+      case 'F': //Erratic & Tunneling & Telepathy & Intelligence
 	break;
       }
   }
-  
 }
 
 /*
