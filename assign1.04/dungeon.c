@@ -606,26 +606,28 @@ void render_dungeon(dungeon_t *d)
 
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (d->monster_map[p[dim_y]][p[dim_x]] != NULL) {
-        putchar(d->monster_map[p[dim_y]][p[dim_x]]);
-      } else {
-        switch (mappair(p)) {
-        case ter_wall:
-        case ter_wall_immutable:
-          putchar(' ');
-          break;
-        case ter_floor:
-        case ter_floor_room:
-          putchar('.');
-          break;
-        case ter_floor_hall:
-          putchar('#');
-          break;
-        case ter_debug:
-          putchar('*');
-          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
-          break;
-        }
+      if (d->m_map[p[dim_y]][p[dim_x]] != NULL)
+	{
+	  putchar(d->m_map[p[dim_y]][p[dim_x]]->prop);
+	}
+      else {
+	switch (mappair(p)) {
+	case ter_wall:
+	case ter_wall_immutable:
+	  putchar(' ');
+	  break;
+	case ter_floor:
+	case ter_floor_room:
+	  putchar('.');
+	  break;
+	case ter_floor_hall:
+	  putchar('#');
+	  break;
+	case ter_debug:
+	  putchar('*');
+	  fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+	  break;
+	}
       }
     }
     putchar('\n');

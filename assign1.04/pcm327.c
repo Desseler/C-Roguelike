@@ -19,20 +19,33 @@ void usage(char *name)
  * Start Trevor's code
  */
 
+static int32_t monster_cmp(const void *key, const void *with) {
+  if(((monster_t *) key)->turn > ((monster_t *) with)->turn) {
+    return 1;
+  } else if(((monster_t *) key)->turn < ((monster_t *) with)->turn) {
+    return -1;
+  } else if(((monster_t *) key)->tie > ((monster_t *) with)->tie) {
+    return 1;
+  } else if(((monster_t *) key)->tie < ((monster_t *) with)->tie) {
+    return -1;
+  }
+  return 0;
+}
+
 int line_of_sight(dungeon_t *d, int y, int x)
 {
-  int room_count = sizeof(d->rooms)/sizeof(room);
+  int room_count = sizeof(d->rooms)/sizeof(d->rooms[0]);
   for(int i = 0; i < room_count; i++)
     {
-      if(d->rooms[i].position[dim_y]                          <= d->pc.position[dim_y] &&
-	 d->rooms[i].position[dim_y] + d-rooms[i].size[dim_y] >= d->pc.position[dim_y] &&
-	 d->rooms[i].position[dim_x]                          <= d->pc.position[dim_x] &&
-	 d->rooms[i].position[dim_x] + d-rooms[i].size[dim_x] >= d->pc.position[dim_x])
+      if(d->rooms[i].position[dim_y]                           <= d->pc.position[dim_y] &&
+	 d->rooms[i].position[dim_y] + d->rooms[i].size[dim_y] >= d->pc.position[dim_y] &&
+	 d->rooms[i].position[dim_x]                           <= d->pc.position[dim_x] &&
+	 d->rooms[i].position[dim_x] + d->rooms[i].size[dim_x] >= d->pc.position[dim_x])
 	{
-	  if(d->rooms[i].position[dim_y]                          <= y &&
-	     d->rooms[i].position[dim_y] + d-rooms[i].size[dim_y] >= y &&
-	     d->rooms[i].position[dim_x]                          <= y &&
-	     d->rooms[i].position[dim_x] + d-rooms[i].size[dim_x] >= y)
+	  if(d->rooms[i].position[dim_y]                           <= y &&
+	     d->rooms[i].position[dim_y] + d->rooms[i].size[dim_y] >= y &&
+	     d->rooms[i].position[dim_x]                           <= y &&
+	     d->rooms[i].position[dim_x] + d->rooms[i].size[dim_x] >= y)
 	    {
 	      return 1;
 	    }
@@ -45,15 +58,22 @@ int line_of_sight(dungeon_t *d, int y, int x)
   return 0;
 }
 
-void move(dungeon_t *d, monster_t *m)
+int move(dungeon_t *d, monster_t *m)
 {
-  pair_t p = m->pos;
-  switch (d->m_map[p[dim_y]][p[dim_x]])
+  int x = 0;
+  int y = 0;
+  uint16_t temp = 65535;
+  int move = 0;
+  pc_t pctemp;
+  pair_t p;
+  p[dim_y] = m->pos[dim_y];
+  p[dim_x] = m->pos[dim_x];
+  switch (d->m_map[p[dim_y]][p[dim_x]]->prop)
     {
     case '@': //PC
-      int y;
-      int x;
-      int move = 0;
+      y = 0;
+      x = 0;
+      move = 0;
       while(move == 0)
 	{
 	  y = d->pc.position[dim_y] + (rand() % ((d->pc.position[dim_y] + 1) + 1 - (d->pc.position[dim_y] - 1)) + (d->pc.position[dim_y] - 1));
@@ -63,22 +83,26 @@ void move(dungeon_t *d, monster_t *m)
 	      move = 1;
 	    }
 	}
+      if(d->m_map[y][x] != NULL)
+	{
+	  d->m_map[y][x]->hn = NULL;
+	}
       d->m_map[p[dim_y]][p[dim_x]] = NULL;
       d->pc.position[dim_y] = y;
       d->pc.position[dim_x] = x;
       m->pos[dim_y] = y;
       m->pos[dim_x] = x;
-      d->m_map[y][x] = &m;
+      d->m_map[y][x] = m;
       
       return 1;
       
       break;
       
     case '0': //No Traits.
-      if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+      if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	{
-	  int y;
-	  int x;
+	  y = 0;
+	  x = 0;
 	  if(d->pc.position[dim_y] > p[dim_y])
 	    {
 	      y = 1;
@@ -111,10 +135,18 @@ void move(dungeon_t *d, monster_t *m)
 	    }
 	  if(mapxy(x, y) >= ter_floor)
 	    {
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      return 0;
+		    }
+		}
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_y] = y;
 	      m->pos[dim_x] = x;
-	      d->m_map[y][x] = &m;
+	      d->m_map[y][x] = m;
 	      
 	      return 1;
 	    }
@@ -122,20 +154,39 @@ void move(dungeon_t *d, monster_t *m)
 	    {
 	      if(mapxy(x, p[dim_y]) >= ter_floor)
 		{
-		  d->m_map[p[dim_y]][p[dim_x]] = NULL;
-		  m->pos[dim_x] = x;
-		  d->m_map[p[dim_y]][x] = &m;
-		  
-		  return 1;
+		  if(d->m_map[p[dim_y]][x] != NULL)
+		{
+		  d->m_map[p[dim_y]][x]->hn = NULL;
+		  if(d->m_map[p[dim_y]][x]->prop == '@')
+		    {
+		      return 0;
+		    }
+		}
+		
+		d->m_map[p[dim_y]][p[dim_x]] = NULL;
+		m->pos[dim_x] = x;
+		d->m_map[p[dim_y]][x] = m;
+		
+		return 1;
 		}
 	      else
 		{
 		  if(mapxy(p[dim_x], y) >= ter_floor)
 		    {
+		      if(d->m_map[y][p[dim_x]] != NULL)
+			{
+			  d->m_map[y][p[dim_x]]->hn = NULL;
+			  if(d->m_map[y][p[dim_x]]->prop == '@')
+			    {
+			      return 0;
+			    }
+			}
+		      
 		      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		      m->pos[dim_y] = y;
-		      d->m_map[y][p[dim_x]] = &m;
-		      
+		      d->m_map[y][p[dim_x]] = m;
+
+		      return 1;
 		    }
 		  return 1;
 		}
@@ -143,9 +194,9 @@ void move(dungeon_t *d, monster_t *m)
 	}
       else
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -155,23 +206,34 @@ void move(dungeon_t *d, monster_t *m)
 		  move = 1;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 	  
 	  return 1;
 	}
       break;
       
     case '1': //Intelligence
-      if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+      if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	{
-	  m->pc.position = d->pc.position;
-	  dijkstra(&d);
-	  int x;
-	  int y;
-	  uint8_t temp = INT_MAX;
+	  m->pc.position[dim_y] = d->pc.position[dim_y];
+	  m->pc.position[dim_x] = d->pc.position[dim_x];
+	  dijkstra(d);
+	  x = 0;
+	  y = 0;
+	  temp = 65535;
 	  for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
 	    {
 	      for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
@@ -184,24 +246,34 @@ void move(dungeon_t *d, monster_t *m)
 		    }
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
-
+	  d->m_map[y][x] = m;
+	  
 	  return 1;
 	}
       else
 	{
 	  if(m->pc.position[dim_y] != 0)
 	    {
-	      pc_t pctemp = d->pc;
+	      pctemp = d->pc;
 	      d->pc = m->pc;
-	      dijsktra(&d);
+	      dijkstra(d);
 	      d->pc = pctemp;
-	      int x;
-	      int y;
-	      uint8_t temp = INT_MAX;
+	      x = 0;
+	      y = 0;
+	      temp = 65535;
 	      for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
 		{
 		  for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
@@ -214,17 +286,27 @@ void move(dungeon_t *d, monster_t *m)
 			}
 		    }
 		}
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_y] = y;
 	      m->pos[dim_x] = x;
-	      d->m_map[y][x] = &m;
+	      d->m_map[y][x] = m;
 	      
 	    }
 	  else
 	    {
-	      int y;
-	      int x;
-	      int move = 0;
+	      y = 0;
+	      x = 0;
+	      move = 0;
 	      while(move == 0)
 		{
 		  y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -234,10 +316,20 @@ void move(dungeon_t *d, monster_t *m)
 		      move = 1;
 		    }
 		}
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_y] = y;
 	      m->pos[dim_x] = x;
-	      d->m_map[y][x] = &m;
+	      d->m_map[y][x] = m;
 
 	      return 1;
 	    }
@@ -245,8 +337,8 @@ void move(dungeon_t *d, monster_t *m)
       break;
       
     case '2': //Telepathy
-      int y;
-      int x;
+      y = 0;
+      x = 0;
       if(d->pc.position[dim_y] > p[dim_y])
 	{
 	  y = 1;
@@ -279,31 +371,61 @@ void move(dungeon_t *d, monster_t *m)
 	}
       if(mapxy(x, y) >= ter_floor)
 	{
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
-
+	  d->m_map[y][x] = m;
+	  
 	  return 1;
 	}
       else
 	{
 	  if(mapxy(x, p[dim_y]) >= ter_floor)
 	    {
+	      if(d->m_map[p[dim_y]][x] != NULL)
+		{
+		  d->m_map[p[dim_y]][x]->hn = NULL;
+		  if(d->m_map[p[dim_y]][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_x] = x;
-	      d->m_map[p[dim_y]][x] = &m;
-
+	      d->m_map[p[dim_y]][x] = m;
+	      
 	      return 1;
 	    }
 	  else
 	    {
 	      if(mapxy(p[dim_x], y) >= ter_floor)
 		{
+		  if(d->m_map[y][p[dim_x]] != NULL)
+		    {
+		      d->m_map[y][p[dim_x]]->hn = NULL;
+		      if(d->m_map[y][p[dim_x]]->prop == '@')
+			{
+			  //END GAME***
+			  return 0;
+			}
+		    }
+		  
 		  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		  m->pos[dim_y] = y;
-		  d->m_map[y][p[dim_x]] = &m;
-
+		  d->m_map[y][p[dim_x]] = m;
+		  
 		}
 	      return 1;
 	    }
@@ -311,10 +433,10 @@ void move(dungeon_t *d, monster_t *m)
       break;
       
     case '3': //Telepathy & Intelligence
-      dijkstra(&d);
-      int x;
-      int y;
-      uint8_t temp = INT_MAX;
+      dijkstra(d);
+      x = 0;
+      y = 0;
+      temp = 65535;
       for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
 	{
 	  for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
@@ -327,20 +449,30 @@ void move(dungeon_t *d, monster_t *m)
 		}
 	    }
 	}
+      if(d->m_map[y][x] != NULL)
+	{
+	  d->m_map[y][x]->hn = NULL;
+	  if(d->m_map[y][x]->prop == '@')
+	    {
+	      //END GAME***
+	      return 0;
+	    }
+	}
+      
       d->m_map[p[dim_y]][p[dim_x]] = NULL;
       m->pos[dim_y] = y;
       m->pos[dim_x] = x;
-      d->m_map[y][x] = &m;
+      d->m_map[y][x] = m;
 
       return 1;
       
       break;
       
     case '4': //Tunneling
-      if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+      if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	{
-	  int y;
-	  int x;
+	  y = 0;
+	  x = 0;
 	  if(d->pc.position[dim_y] > p[dim_y])
 	    {
 	      y = 1;
@@ -373,10 +505,20 @@ void move(dungeon_t *d, monster_t *m)
 	    }
 	  if(mapxy(x, y) >= ter_floor)
 	    {
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_y] = y;
 	      m->pos[dim_x] = x;
-	      d->m_map[y][x] = &m;
+	      d->m_map[y][x] = m;
 	      
 	      
 	      return 1;
@@ -385,9 +527,19 @@ void move(dungeon_t *d, monster_t *m)
 	    {
 	      if(mapxy(x, p[dim_y]) >= ter_floor)
 		{
+		  if(d->m_map[p[dim_y]][x] != NULL)
+		    {
+		      d->m_map[p[dim_y]][x]->hn = NULL;
+		      if(d->m_map[p[dim_y]][x]->prop == '@')
+			{
+			  //END GAME***
+			  return 0;
+			}
+		    }
+		  
 		  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		  m->pos[dim_x] = x;
-		  d->m_map[p[dim_y]][x] = &m;
+		  d->m_map[p[dim_y]][x] = m;
 		  
 		  
 		  return 1;
@@ -396,9 +548,19 @@ void move(dungeon_t *d, monster_t *m)
 		{
 		  if(mapxy(p[dim_x], y) >= ter_floor)
 		    {
+		      if(d->m_map[y][p[dim_x]] != NULL)
+			{
+			  d->m_map[y][p[dim_x]]->hn = NULL;
+			  if(d->m_map[y][p[dim_x]]->prop == '@')
+			    {
+			      //END GAME***
+			      return 0;
+			    }
+			}
+		      
 		      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		      m->pos[dim_y] = y;
-		      d->m_map[y][p[dim_x]] = &m;
+		      d->m_map[y][p[dim_x]] = m;
 		      return 1;
 		    }
 		  return 1;
@@ -407,9 +569,9 @@ void move(dungeon_t *d, monster_t *m)
 	}
       else
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -433,33 +595,300 @@ void move(dungeon_t *d, monster_t *m)
 		  mapxy(x, y) = ter_floor_hall;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 	  
 	  return 1;
 	}
       break;
       
     case '5': //Tunneling & Intelligence
-      //TODO***
+      if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
+	{
+	  m->pc.position[dim_y] = d->pc.position[dim_y];
+	  m->pc.position[dim_x] = d->pc.position[dim_x];
+	  dijkstra_tunnel(d);
+	  x = 0;
+	  y = 0;
+	  temp = 65535;
+	  for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
+	    {
+	      for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
+		{
+		  if(d->pc_tunnel[j][i] < temp)
+		    {
+		      temp = d->pc_tunnel[j][i];
+		      y = j;
+		      x = i;
+		    }
+		}
+	    }
+	  if(mapxy(x, y) == ter_wall)
+	    {
+	      if(hardnessxy(x, y) > 85)
+		{
+		  hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+		  
+		  return 1;
+		}
+	      else
+		{
+		  hardnessxy(x, y) = 0;
+		  mapxy(x, y) = ter_floor_hall;
+		}
+	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
+	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
+	  m->pos[dim_y] = y;
+	  m->pos[dim_x] = x;
+	  d->m_map[y][x] = m;
+	  
+	  return 1;
+	}
+      else
+	{
+	  if(m->pc.position[dim_y] != 0)
+	    {
+	      pctemp = d->pc;
+	      d->pc = m->pc;
+	      dijkstra_tunnel(d);
+	      d->pc = pctemp;
+	      x = 0;
+	      y = 0;
+	      temp = 65535;
+	      for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
+		{
+		  for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
+		    {
+		      if(d->pc_tunnel[j][i] < temp)
+			{
+			  temp = d->pc_tunnel[j][i];
+			  y = j;
+			  x = i;
+			}
+		    }
+		}
+	      if(mapxy(x, y) == ter_wall)
+		{
+		  if(hardnessxy(x, y) > 85)
+		    {
+		      hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+		      
+		      return 1;
+		    }
+		  else
+		    {
+		      hardnessxy(x, y) = 0;
+		      mapxy(x, y) = ter_floor_hall;
+		    }
+		}
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
+	      
+	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
+	      m->pos[dim_y] = y;
+	      m->pos[dim_x] = x;
+	      d->m_map[y][x] = m;
+	      
+	    }
+	  else
+	    {
+	      y = 0;
+	      x = 0;
+	      move = 0;
+	      while(move == 0)
+		{
+		  y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
+		  x = p[dim_x] + (rand() % ((p[dim_x] + 1) + 1 - (p[dim_x] - 1)) + (p[dim_x] - 1));
+		  if (mapxy(x, y) != ter_wall_immutable)
+		    {
+		      move = 1;
+		    }
+		}
+	      if(mapxy(x, y) == ter_wall)
+		{
+		  if(hardnessxy(x, y) > 85)
+		    {
+		      hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+		      
+		      return 1;
+		    }
+		  else
+		    {
+		      hardnessxy(x, y) = 0;
+		      mapxy(x, y) = ter_floor_hall;
+		    }
+		}
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
+	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
+	      m->pos[dim_y] = y;
+	      m->pos[dim_x] = x;
+	      d->m_map[y][x] = m;
+	      
+	      return 1;
+	    }
+	}
       break;
       
     case '6': //Tunneling & Telepathy
-      //TODO***
+      y = 0;
+      x = 0;
+      if(d->pc.position[dim_y] > p[dim_y])
+	{
+	  y = 1;
+	}
+      else
+	{
+	  if(d->pc.position[dim_y] < p[dim_y])
+	    {
+	      y = -1;
+	    }
+	  else
+	    {
+	      y = 0;
+	    }
+	}
+      if(d->pc.position[dim_x] > p[dim_x])
+	{
+	  x = 1;
+	}
+      else
+	{
+	  if(d->pc.position[dim_x] < p[dim_x])
+	    {
+	      x = -1;
+	    }
+	  else
+	    {
+	      x = 0;
+	    }
+	}
+      if(mapxy(x, y) == ter_wall)
+	{
+	  if(hardnessxy(x, y) > 85)
+	    {
+	      hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+	      return 1;
+	    }
+	  else
+	    {
+	      hardnessxy(x, y) = 0;
+	      mapxy(x, y) = ter_floor_hall;
+	    }
+	}
+      if(d->m_map[y][x] != NULL)
+	{
+	  d->m_map[y][x]->hn = NULL;
+	  if(d->m_map[y][x]->prop == '@')
+	    {
+	      //END GAME***
+	      return 0;
+	    }
+	}
+      
+      d->m_map[p[dim_y]][p[dim_x]] = NULL;
+      m->pos[dim_y] = y;
+      m->pos[dim_x] = x;
+      d->m_map[y][x] = m;
+      
+      return 1;
+	  
       break;
       
     case '7': //Tunneling & Telepathy & Intelligence
-      //TODO***
+      dijkstra_tunnel(d);
+      x = 0;
+      y = 0;
+      temp = 65535;
+      for(int j = p[dim_y] - 1; j < p[dim_y] + 2; j++)
+	{
+	  for(int i = p[dim_x] - 1; i < p[dim_x] + 2; i++)
+	    {
+	      if(d->pc_tunnel[j][i] < temp)
+		{
+		  temp = d->pc_tunnel[j][i];
+		  y = j;
+		  x = i;
+		}
+	    }
+	}
+      if(mapxy(x, y) == ter_wall)
+	{
+	  if(hardnessxy(x, y) > 85)
+	    {
+	      hardnessxy(x, y) = (hardnessxy(x, y) - 85);
+
+	      return 1;
+	    }
+	  else
+	    {
+	      hardnessxy(x, y) = 0;
+	      mapxy(x, y) = ter_floor_hall;
+	    }
+	}
+      if(d->m_map[y][x] != NULL)
+	{
+	  d->m_map[y][x]->hn = NULL;
+	  if(d->m_map[y][x]->prop == '@')
+	    {
+	      //END GAME***
+	      return 0;
+	    }
+	}
+      
+      d->m_map[p[dim_y]][p[dim_x]] = NULL;
+      m->pos[dim_y] = y;
+      m->pos[dim_x] = x;
+      d->m_map[y][x] = m;
+
+      return 1;
       break;
       
     case '8': //Erratic
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -469,19 +898,29 @@ void move(dungeon_t *d, monster_t *m)
 		  move = 1;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 	  
 	  return 1;
 	}
       else
 	{
-	  if(line_of_sight(&d, p[dim_y], p[dim_x]) == 1)
+	  if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	    {
-	      int y;
-	      int x;
+	      y = 0;
+	      x = 0;
 	      if(d->pc.position[dim_y] > p[dim_y])
 		{
 		  y = 1;
@@ -514,10 +953,20 @@ void move(dungeon_t *d, monster_t *m)
 		}
 	      if(mapxy(x, y) >= ter_floor)
 		{
+		  if(d->m_map[y][x] != NULL)
+		    {
+		      d->m_map[y][x]->hn = NULL;
+		      if(d->m_map[y][x]->prop == '@')
+			{
+			  //END GAME***
+			  return 0;
+			}
+		    }
+		  
 		  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		  m->pos[dim_y] = y;
 		  m->pos[dim_x] = x;
-		  d->m_map[y][x] = &m;
+		  d->m_map[y][x] = m;
 		  
 		  return 1;
 		}
@@ -525,9 +974,19 @@ void move(dungeon_t *d, monster_t *m)
 		{
 		  if(mapxy(x, p[dim_y]) >= ter_floor)
 		    {
+		      if(d->m_map[p[dim_y]][x] != NULL)
+			{
+			  d->m_map[p[dim_y]][x]->hn = NULL;
+			  if(d->m_map[p[dim_y]][x]->prop == '@')
+			    {
+			      //END GAME***
+			      return 0;
+			    }
+			}
+		      
 		      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 		      m->pos[dim_x] = x;
-		      d->m_map[p[dim_y]][x] = &m;
+		      d->m_map[p[dim_y]][x] = m;
 		      
 		      return 1;
 		    }
@@ -535,9 +994,19 @@ void move(dungeon_t *d, monster_t *m)
 		    {
 		      if(mapxy(p[dim_x], y) >= ter_floor)
 			{
+			  if(d->m_map[y][p[dim_x]] != NULL)
+			    {
+			      d->m_map[y][p[dim_x]]->hn = NULL;
+			      if(d->m_map[y][p[dim_x]]->prop == '@')
+				{
+				  //END GAME***
+				  return 0;
+				}
+			    }
+			  
 			  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 			  m->pos[dim_y] = y;
-			  d->m_map[y][p[dim_x]] = &m;
+			  d->m_map[y][p[dim_x]] = m;
 
 			  return 1;
 			}
@@ -547,9 +1016,9 @@ void move(dungeon_t *d, monster_t *m)
 	    }
 	  else
 	    {
-	      int y;
-	      int x;
-	      int move = 0;
+	      y = 0;
+	      x = 0;
+	      move = 0;
 	      while(move == 0)
 		{
 		  y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -559,10 +1028,20 @@ void move(dungeon_t *d, monster_t *m)
 		      move = 1;
 		    }
 		}
+	      if(d->m_map[y][x] != NULL)
+		{
+		  d->m_map[y][x]->hn = NULL;
+		  if(d->m_map[y][x]->prop == '@')
+		    {
+		      //END GAME***
+		      return 0;
+		    }
+		}
+	      
 	      d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	      m->pos[dim_y] = y;
 	      m->pos[dim_x] = x;
-	      d->m_map[y][x] = &m;
+	      d->m_map[y][x] = m;
 	      
 	      return 1;
 	    }
@@ -572,9 +1051,9 @@ void move(dungeon_t *d, monster_t *m)
     case '9': //Erratic & Intelligence
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -584,10 +1063,20 @@ void move(dungeon_t *d, monster_t *m)
 		  move = 1;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 	  
 	  return 1;
 	} else {
@@ -598,9 +1087,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'a': //Erratic & Telepathy
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -610,10 +1099,20 @@ void move(dungeon_t *d, monster_t *m)
 		  move = 1;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 
 	  return 1;
 	} else {
@@ -624,9 +1123,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'b': //Erratic & Telepathy & Intelligence
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -636,10 +1135,20 @@ void move(dungeon_t *d, monster_t *m)
 		  move = 1;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 
 	  return 1;
 	} else {
@@ -650,9 +1159,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'c': //Erratic & Tunneling
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -676,10 +1185,20 @@ void move(dungeon_t *d, monster_t *m)
 		  mapxy(x, y) = ter_floor_hall;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 
 	  return 1;
 	} else {
@@ -690,9 +1209,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'd': //Erratic & Tunneling & Intelligence
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -716,10 +1235,20 @@ void move(dungeon_t *d, monster_t *m)
 		  mapxy(x, y) = ter_floor_hall;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 
 	  return 1;
 	} else {
@@ -731,9 +1260,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'e': //Erratic & Tunneling & Telepathy
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -757,14 +1286,25 @@ void move(dungeon_t *d, monster_t *m)
 		  mapxy(x, y) = ter_floor_hall;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 
 	  return 1;
 	} else {
 	//TODO***
+	return 0;
       }
       
       break;
@@ -772,9 +1312,9 @@ void move(dungeon_t *d, monster_t *m)
     case 'f': //Erratic & Tunneling & Telepathy & Intelligence
       if(rand() % 2 == 0)
 	{
-	  int y;
-	  int x;
-	  int move = 0;
+	  y = 0;
+	  x = 0;
+	  move = 0;
 	  while(move == 0)
 	    {
 	      y = p[dim_y] + (rand() % ((p[dim_y] + 1) + 1 - (p[dim_y] - 1)) + (p[dim_y] - 1));
@@ -798,73 +1338,143 @@ void move(dungeon_t *d, monster_t *m)
 		  mapxy(x, y) = ter_floor_hall;
 		}
 	    }
+	  if(d->m_map[y][x] != NULL)
+	    {
+	      d->m_map[y][x]->hn = NULL;
+	      if(d->m_map[y][x]->prop == '@')
+		{
+		  //END GAME***
+		  return 0;
+		}
+	    }
+	  
 	  d->m_map[p[dim_y]][p[dim_x]] = NULL;
 	  m->pos[dim_y] = y;
 	  m->pos[dim_x] = x;
-	  d->m_map[y][x] = &m;
+	  d->m_map[y][x] = m;
 	  
 	  return 1;
 	} else {
 	//TODO***
       }
       
-      break;
+      break;  
     }
+  return 1; 
+}
+
+void add_pc(dungeon_t *d, pair_t pc, heap_t *h){
+  heap_init(h, monster_cmp, NULL);
+  monster_t * monster = (monster_t *) malloc(sizeof(monster_t));
+  monster->pos[dim_y] = pc[dim_y];
+  monster->pos[dim_x] = pc[dim_x];
+  monster->prop = '@';
+  monster->tie = 0;
+  monster->speed = 10;
+  monster->hn = heap_insert(h, monster);
+  d->m_map[pc[dim_y]][pc[dim_x]] = monster;
+  d->pc.position[dim_y] = pc[dim_y];
+  d->pc.position[dim_x] = pc[dim_x];
 }
 
 void add_monsters(dungeon_t *d, int monster_count, heap_t *h)
 {
-  heap_init(&h, monster_cmp, NULL);
+  //heap_init(&h, monster_cmp, NULL);
   for(int i = 0; i < monster_count; i++)
     {
       int x = 0;
       int y = 0;
       while(mapxy(x, y) < ter_floor)
 	{
-	  int x = rand() % (DUNGEON_X - 1) + 1;
-	  int y = rand() % (DUNGEON_Y - 1) + 1;
+	  x = rand() % (DUNGEON_X - 1) + 1;
+	  y = rand() % (DUNGEON_Y - 1) + 1;
 	}
-      char property = rand() % 16;
-      switch (property)
+      int prop = rand() % 16;
+      char property;
+      switch (prop)
 	{
-	case '10':
+	case 0:
+	  property = '0';
+	  break;
+
+	case 1:
+	  property = '1';
+	  break;
+	  
+	case 2:
+	  property = '2';
+	  break;
+
+	case 3:
+	  property = '3';
+	  break;
+
+	case 4:
+	  property = '4';
+	  break;
+
+	case 5:
+	  property = '5';
+	  break;
+
+	case 6:
+	  property = '6';
+	  break;
+
+	case 7:
+	  property = '7';
+	  break;
+
+	case 8:
+	  property = '8';
+	  break;
+
+	case 9:
+	  property = '9';
+	  break;
+	  
+	case 10:
 	  property = 'a';
 	  break;
 
-	case '11':
+	case 11:
 	  property = 'b';
 	  break;
 
-	case '12':
+	case 12:
 	  property = 'c';
 	  break;
 
-	case '13':
+	case 13:
 	  property = 'd';
 	  break;
 
-	case '14':
+	case 14:
 	  property = 'e';
 	  break;
 
-	case '15':
+	case 15:
 	  property = 'f';
 	  break;
 
 	default:
 	  break;
 	}
-      d->monster_map[y][x] = property;
       monster_t * monster = (monster_t *) malloc(sizeof(monster_t));
-      monster.position[dim_y] = y;
-      monster.position[dim_x] = x;
-      monster.properties = property;
-      monster.speed = rand() % (20 + 1 - 5) + 5;
-      monster.alive = 1;
-      heap_insert(&h, &monster);
+      monster->pos[dim_y] = y;
+      monster->pos[dim_x] = x;
+      monster->prop = property;
+      monster->tie = i + 1;
+      monster->speed = rand() % (20 + 1 - 5) + 5;
+      monster->hn = heap_insert(h, monster);
+      d->m_map[y][x] = monster;
     }
 }
 
+//void floor(dungeon_t *d, heap_t *h)
+//{
+//}
+ 
 /*
  * End Trevor's code
  */
@@ -1011,8 +1621,14 @@ int main(int argc, char *argv[])
   printf("PC is at (y, x): %d, %d\n",
          d.pc.position[dim_y], d.pc.position[dim_x]);
 
+  heap_t h;
+  add_pc(&d, d.pc.position, &h);
+  add_monsters(&d, 100, &h);
+  
   render_dungeon(&d);
 
+  printf("Made it past 'render_dungeon'");
+  
   dijkstra(&d);
   dijkstra_tunnel(&d);
   render_distance_map(&d);
