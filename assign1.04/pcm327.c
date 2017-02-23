@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include "dungeon.h"
 #include "path.h"
@@ -68,7 +69,7 @@ int move(dungeon_t *d, monster_t *m)
   pair_t p;
   p[dim_y] = m->pos[dim_y];
   p[dim_x] = m->pos[dim_x];
-  switch (d->m_map[p[dim_y]][p[dim_x]]->prop)
+  switch (m->prop)
     {
     case '@': //PC
       y = 0;
@@ -87,7 +88,7 @@ int move(dungeon_t *d, monster_t *m)
 	{
 	  d->m_map[y][x]->hn = NULL;
 	}
-      d->m_map[p[dim_y]][p[dim_x]] = NULL;
+      //d->m_map[p[dim_y]][p[dim_x]] = NULL;
       d->pc.position[dim_y] = y;
       d->pc.position[dim_x] = x;
       m->pos[dim_y] = y;
@@ -95,7 +96,7 @@ int move(dungeon_t *d, monster_t *m)
       d->m_map[y][x] = m;
       
       return 1;
-      
+      printf("PC Moved!!!");
       break;
       
     case '0': //No Traits.
@@ -228,8 +229,8 @@ int move(dungeon_t *d, monster_t *m)
     case '1': //Intelligence
       if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	{
-	  m->pc.position[dim_y] = d->pc.position[dim_y];
-	  m->pc.position[dim_x] = d->pc.position[dim_x];
+	  m->pc[dim_y] = d->pc.position[dim_y];
+	  m->pc[dim_x] = d->pc.position[dim_x];
 	  dijkstra(d);
 	  x = 0;
 	  y = 0;
@@ -265,10 +266,11 @@ int move(dungeon_t *d, monster_t *m)
 	}
       else
 	{
-	  if(m->pc.position[dim_y] != 0)
+	  if(m->pc[dim_y] != 0)
 	    {
 	      pctemp = d->pc;
-	      d->pc = m->pc;
+	      d->pc.position[dim_y] = m->pc[dim_y];
+	      d->pc.position[dim_x] = m->pc[dim_x];
 	      dijkstra(d);
 	      d->pc = pctemp;
 	      x = 0;
@@ -617,8 +619,8 @@ int move(dungeon_t *d, monster_t *m)
     case '5': //Tunneling & Intelligence
       if(line_of_sight(d, p[dim_y], p[dim_x]) == 1)
 	{
-	  m->pc.position[dim_y] = d->pc.position[dim_y];
-	  m->pc.position[dim_x] = d->pc.position[dim_x];
+	  m->pc[dim_y] = d->pc.position[dim_y];
+	  m->pc[dim_x] = d->pc.position[dim_x];
 	  dijkstra_tunnel(d);
 	  x = 0;
 	  y = 0;
@@ -668,10 +670,11 @@ int move(dungeon_t *d, monster_t *m)
 	}
       else
 	{
-	  if(m->pc.position[dim_y] != 0)
+	  if(m->pc[dim_y] != 0)
 	    {
 	      pctemp = d->pc;
-	      d->pc = m->pc;
+	      d->pc.position[dim_y] = m->pc[dim_y];
+	      d->pc.position[dim_x] = m->pc[dim_x];
 	      dijkstra_tunnel(d);
 	      d->pc = pctemp;
 	      x = 0;
@@ -1371,6 +1374,7 @@ void add_pc(dungeon_t *d, pair_t pc, heap_t *h){
   monster->prop = '@';
   monster->tie = 0;
   monster->speed = 10;
+  monster->turn = 100;
   monster->hn = heap_insert(h, monster);
   d->m_map[pc[dim_y]][pc[dim_x]] = monster;
   d->pc.position[dim_y] = pc[dim_y];
@@ -1466,6 +1470,7 @@ void add_monsters(dungeon_t *d, int monster_count, heap_t *h)
       monster->prop = property;
       monster->tie = i + 1;
       monster->speed = rand() % (20 + 1 - 5) + 5;
+      monster->turn = 1000/(monster->speed);
       monster->hn = heap_insert(h, monster);
       d->m_map[y][x] = monster;
     }
@@ -1623,16 +1628,21 @@ int main(int argc, char *argv[])
 
   heap_t h;
   add_pc(&d, d.pc.position, &h);
-  add_monsters(&d, 100, &h);
-  
-  render_dungeon(&d);
+  add_monsters(&d, 50, &h);
 
-  printf("Made it past 'render_dungeon'");
+  int finish = 1;
+  while(finish == 1)
+    {
+      monster_t *m;
+      render_dungeon(&d);
+      m = heap_remove_min(&h);
+      m->turn += 1000/(m->speed);
+      finish = move(&d, m);
+      m->hn = heap_insert(&h, m);
+      render_dungeon(&d);
+      usleep(13333);
+    }
   
-  dijkstra(&d);
-  dijkstra_tunnel(&d);
-  render_distance_map(&d);
-  render_tunnel_distance_map(&d);
 
   if (do_save) {
     write_dungeon(&d, save_file);

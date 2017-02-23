@@ -1,1 +1,5 @@
 Assignment 1.04 for ComS 327. Implements Player Character and Monsters.
+
+Assignment 1.03 solution code provided by Jeremy Shaeffer.
+
+Use "make pcm327" to compile. Use "./pcm327" to run. Use "make clean" when finished.

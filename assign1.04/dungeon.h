@@ -43,7 +43,7 @@ typedef struct monster {
   uint16_t tie;
   uint16_t turn;
   pair_t pos;
-  pc_t pc;
+  pair_t pc;
 } monster_t;
 
 typedef struct room {
@@ -58,6 +58,7 @@ typedef struct room {
 typedef struct dungeon {
   uint32_t num_rooms;
   room_t *rooms;
+  monster_t * m_map[DUNGEON_Y][DUNGEON_X];
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
   /* Since hardness is usually not used, it would be expensive to pull it *
    * into cache every time we need a map cell, so we store it in a        *
@@ -70,7 +71,6 @@ typedef struct dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
-  monster_t *m_map[DUNGEON_Y][DUNGEON_X];
   pc_t pc;
 } dungeon_t;
 
