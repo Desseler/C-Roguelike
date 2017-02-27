@@ -1,0 +1,71 @@
+1.)
+a) No error
+
+b) No error
+
+c) Runtime error. Can't modify the string constant.
+
+d) "against the rules"
+
+e) Runtime error. No NULL byte. Will not stop because it will not find a NULL terminator.
+
+f) No output. Starts on NULL terminator
+
+
+2.)
+
+void swap(int *a, int *b)
+{
+  int tmp;
+  tmp = *a;
+  *a = *b;
+  *b = tmp;
+}
+
+
+b)
+
+void freeplusplus(void **p)
+{
+  free(*p);
+  *p = NULL;
+}
+
+
+c)
+
+{
+  char *o;
+  int i;
+  if((o = malloc(n + 1))){
+    for(i = 0; i < n && *s; i++, s++){
+      o[i] = *s;
+    }
+    o[i] = '\0';
+  }
+  
+}
+
+
+
+3.)
+
+a) b
+
+b) b
+
+c) a
+
+d) a
+
+e) b. i and j have the same address
+
+f) c
+
+g) c
+
+h) b It's int the text segment
+
+i) a
+
+j) a
