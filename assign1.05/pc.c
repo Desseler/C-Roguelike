@@ -52,6 +52,10 @@ void config_pc(dungeon_t *d)
   dijkstra_tunnel(d);
 }
 
+/*
+ * Modified pc_next_pos to ask for input for ncurses.
+ */
+
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
   //TODO
