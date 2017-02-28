@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <limits.h>
 #include <errno.h>
+#include <time.h>
 
 #include "dungeon.h"
 #include "utils.h"
@@ -592,12 +593,44 @@ static int make_rooms(dungeon_t *d)
   return 0;
 }
 
+void place_stairs(dungeon_t *d)
+{
+  srand(time(NULL));
+  int x;
+  int y;
+  int stair_place;
+  int num_stairs = rand() % (4 + 1 - 2) + 2;
+  for(int i = 0; i < num_stairs; i++)
+    {
+      stair_place = 0;
+      while(stair_place != 1)
+	{
+	  x = rand() % (DUNGEON_X + 1 - 1) + 1;
+	  y = rand() % (DUNGEON_Y + 1 - 1) + 1;
+	  if(mapxy(x, y) >= ter_floor &&
+	     mapxy(x, y) < ter_floor_hall)
+	    {
+	      if(i % 2 == 1) {
+		mapxy(x, y) = ter_stair_up;
+		stair_place = 1;
+	      } else {
+		mapxy(x, y) = ter_stair_down;
+		stair_place = 1;
+	      }
+	    }
+	}
+    }
+}
+
+
 int gen_dungeon(dungeon_t *d)
 {
   do {
     make_rooms(d);
   } while (place_rooms(d));
   connect_rooms(d);
+
+  place_stairs(d);
 
   return 0;
 }
@@ -627,6 +660,12 @@ void render_dungeon(dungeon_t *d)
           putchar('*');
           fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
           break;
+	case ter_stair_up:
+	  putchar('<');
+	  break;
+	case ter_stair_down:
+	  putchar('>');
+	  break;
         }
       }
     }
@@ -644,6 +683,7 @@ void delete_dungeon(dungeon_t *d)
 void init_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);
+
   memset(&d->events, 0, sizeof (d->events));
   heap_init(&d->events, compare_events, event_delete);
 }
@@ -983,6 +1023,8 @@ void render_distance_map(dungeon_t *d)
         case ter_floor:
         case ter_floor_room:
         case ter_floor_hall:
+	case ter_stair_up:
+	case ter_stair_down:
           putchar('0' + d->pc_distance[p[dim_y]][p[dim_x]] % 10);
           break;
         case ter_debug:
@@ -1014,6 +1056,8 @@ void render_tunnel_distance_map(dungeon_t *d)
         case ter_floor:
         case ter_floor_room:
         case ter_floor_hall:
+	case ter_stair_up:
+	case ter_stair_down:
           putchar('0' + d->pc_tunnel[p[dim_y]][p[dim_x]] % 10);
           break;
         case ter_debug:
@@ -1026,3 +1070,4 @@ void render_tunnel_distance_map(dungeon_t *d)
     putchar('\n');
   }
 }
+
