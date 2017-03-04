@@ -2,6 +2,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -215,9 +216,9 @@ int main(int argc, char *argv[])
 
   config_pc(&d);
   gen_monsters(&d);
-
+  initscr();
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
-    render_dungeon(&d);
+    //render_dungeon(&d);
     do_moves(&d);
     usleep(5000);
   }
@@ -235,6 +236,6 @@ int main(int argc, char *argv[])
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
-
+  endwin();
   return 0;
 }

@@ -58,64 +58,120 @@ void config_pc(dungeon_t *d)
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
-  //TODO
+  char in;
   dir[dim_y] = dir[dim_x] = 0;
-  int control = 0;
+  int control = 1;
   int moved = 0;
+  //render_dungeon(d);
   while(moved == 0){
-    char in = getch();
+    render_dungeon(d);
+    in = getch();
     switch(in){
     case '7':
     case 'y':
-      if(mapxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y] - 1) >= ter_floor){
-	dir[dim_x] = -1;
-	dir[dim_y] = -1;
-	moved = 1;
+      if(control == 1){	
+	if(mapxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y] - 1) >= ter_floor){
+	  dir[dim_x] = -1;
+	  dir[dim_y] = -1;
+	  moved = 1;
+	} 
       }
       break;
     case '8':
     case 'k':
-      //move PC one cell up
-      //move view up
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y] - 1) >= ter_floor){
+	  dir[dim_y] = -1;
+	  moved = 1;
+	}
+      } else {
+	
+      }
       break;
     case '9':
     case 'u':
-      //move PC one cell upper right
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y] - 1) >= ter_floor){
+	  dir[dim_x] = 1;
+	  dir[dim_y] = -1;
+	  moved = 1;
+	}
+      }      
       break;
     case '6':
     case 'l':
-      //move PC one cell right
-      //move view right
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y]) >= ter_floor){
+	  dir[dim_x] = 1;
+	  moved = 1;
+	}
+      } else {
+
+      }      
       break;
     case '3':
     case 'n':
-      
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y] + 1) >= ter_floor){
+	  dir[dim_x] = 1;
+	  dir[dim_y] = 1;
+	  moved = 1;
+	}
+      }     
       break;
     case '2':
     case 'j':
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y] + 1) >= ter_floor){
+	  dir[dim_y] = -1;
+	  moved = 1;
+	}
+      } else {
+
+      }
       break;
     case '1':
     case 'b':
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y] + 1) >= ter_floor){
+	  dir[dim_x] = -1;
+	  dir[dim_y] = 1;
+	  moved = 1;
+	}
+      }      
       break;
     case '4':
     case 'h':
+      if(control == 1){
+	if(mapxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y]) >= ter_floor){
+	  dir[dim_x] = -1;
+	  moved = 1;
+	}
+      } else {
+	
+      }
       break;
     case '5':
     case ' ':
+      if(control == 1){
+	moved = 1;
+      }      
       break;
     case '>':
       break;
     case '<':
       break;
     case 'L':
+      control = 0;
       break;
-    case 'esc':
+    case 'w':
+      control = 1;
       break;
     case 'Q':
       break;
+    }
   }
-
-  /*
+    /*
   static uint32_t have_seen_corner = 0;
   static uint32_t count = 0;
 
@@ -224,6 +280,6 @@ uint32_t pc_in_room(dungeon_t *d, uint32_t room)
                                 d->rooms[room].size[dim_y]))) {
     return 1;
   }
-
+  
   return 0;
 }
