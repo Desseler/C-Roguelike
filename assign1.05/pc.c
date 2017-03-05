@@ -7,8 +7,12 @@
 #include "utils.h"
 #include "move.h"
 #include "path.h"
+#include "npc.h"
+
 
 #include <ncurses.h>
+
+#define esc 27
 
 void pc_delete(pc_t *pc)
 {
@@ -141,7 +145,11 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 	  moved = 1;
 	}
       } else {
-	
+	p[dim_y] = p[dim_y] / 21;
+	if(p[dim_y] > 0){
+	  p[dim_y] -= 1;
+	}
+	p[dim_y] = p[dim_y] * 21;
       }
       break;
     case '9':
@@ -162,7 +170,9 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 	  moved = 1;
 	}
       } else {
-
+	if(p[dim_x] == 0){
+	  p[dim_x] = 80;
+	}
       }      
       break;
     case '3':
@@ -183,7 +193,11 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 	  moved = 1;
 	}
       } else {
-
+	p[dim_y] = p[dim_y] / 21;
+	if(p[dim_y] < 4){
+	  p[dim_y] += 1;
+	}
+	p[dim_y] = p[dim_y] * 21;
       }
       break;
     case '1':
@@ -194,7 +208,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 	  dir[dim_y] = 1;
 	  moved = 1;
 	}
-      }      
+      } 
       break;
     case '4':
     case 'h':
@@ -204,7 +218,9 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 	  moved = 1;
 	}
       } else {
-	
+	if(p[dim_x] == 80){
+	  p[dim_x] = 0;
+	} 
       }
       break;
     case '5':
@@ -214,16 +230,36 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       }      
       break;
     case '>':
+      if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y]) >= ter_stair_down){
+	gen_dungeon(d);
+	config_pc(d);
+	gen_monsters(d);
+	moved = 1;
+      }
       break;
     case '<':
+      if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y]) >= ter_stair_up){
+	gen_dungeon(d);
+	config_pc(d);
+	gen_monsters(d);
+	moved =1;
+      }
       break;
     case 'L':
       control = 0;
       break;
-    case 'w':
+    case esc:
       control = 1;
+      p[dim_y] = 21 * (d->pc.position[dim_y] / 21);
+      p[dim_x] = 80 * (d->pc.position[dim_x] / 80);
       break;
     case 'Q':
+      endwin();
+
+      pc_delete(d->pc.pc);
+      delete_dungeon(d);
+
+      exit(EXIT_SUCCESS);
       break;
     }
   }
