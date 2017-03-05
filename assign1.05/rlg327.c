@@ -222,12 +222,10 @@ int main(int argc, char *argv[])
   curs_set(FALSE);
   
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
-    //render_dungeon(&d);
     do_moves(&d);
     usleep(5000);
   }
   endwin();
-  //render_dungeon(&d);
 
   if (do_save) {
     write_dungeon(&d, save_file);

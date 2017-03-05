@@ -121,9 +121,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
   dir[dim_y] = dir[dim_x] = 0;
   int control = 1;
   int moved = 0;
-  //render_dungeon(d);
   while(moved == 0){
-    //render_dungeon(d);
     n_draw(d, p);
     in = getch();
     switch(in){
@@ -230,7 +228,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       }      
       break;
     case '>':
-      if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y]) >= ter_stair_down){
+      if(mappair(d->pc.position) == ter_stair_down){
 	gen_dungeon(d);
 	config_pc(d);
 	gen_monsters(d);
@@ -238,7 +236,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       }
       break;
     case '<':
-      if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y]) >= ter_stair_up){
+      if(mappair(d->pc.position) == ter_stair_up){
 	gen_dungeon(d);
 	config_pc(d);
 	gen_monsters(d);
@@ -263,100 +261,6 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       break;
     }
   }
-    /*
-  static uint32_t have_seen_corner = 0;
-  static uint32_t count = 0;
-
-  dir[dim_y] = dir[dim_x] = 0;
-
-  if (in_corner(d, &d->pc)) {
-    if (!count) {
-      count = 1;
-    }
-    have_seen_corner = 1;
-  }
-
-  // First, eat anybody standing next to us. 
-  if (charxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y] - 1)) {
-    dir[dim_y] = -1;
-    dir[dim_x] = -1;
-  } else if (charxy(d->pc.position[dim_x], d->pc.position[dim_y] - 1)) {
-    dir[dim_y] = -1;
-  } else if (charxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y] - 1)) {
-    dir[dim_y] = -1;
-    dir[dim_x] = 1;
-  } else if (charxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y])) {
-    dir[dim_x] = -1;
-  } else if (charxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y])) {
-    dir[dim_x] = 1;
-  } else if (charxy(d->pc.position[dim_x] - 1, d->pc.position[dim_y] + 1)) {
-    dir[dim_y] = 1;
-    dir[dim_x] = -1;
-  } else if (charxy(d->pc.position[dim_x], d->pc.position[dim_y] + 1)) {
-    dir[dim_y] = 1;
-  } else if (charxy(d->pc.position[dim_x] + 1, d->pc.position[dim_y] + 1)) {
-    dir[dim_y] = 1;
-    dir[dim_x] = 1;
-  } else if (!have_seen_corner || count < 250) {
-    // Head to a corner and let most of the NPCs kill each other off 
-    if (count) {
-      count++;
-    }
-    if (!against_wall(d, &d->pc) && ((rand() & 0x111) == 0x111)) {
-      dir[dim_x] = (rand() % 3) - 1;
-      dir[dim_y] = (rand() % 3) - 1;
-    } else {
-      dir_nearest_wall(d, &d->pc, dir);
-    }
-  }else {
-    // And after we've been there, let's head toward the center of the map. 
-    if (!against_wall(d, &d->pc) && ((rand() & 0x111) == 0x111)) {
-      dir[dim_x] = (rand() % 3) - 1;
-      dir[dim_y] = (rand() % 3) - 1;
-    } else {
-      dir[dim_x] = ((d->pc.position[dim_x] > DUNGEON_X / 2) ? -1 : 1);
-      dir[dim_y] = ((d->pc.position[dim_y] > DUNGEON_Y / 2) ? -1 : 1);
-    }
-  }
-
-  // Don't move to an unoccupied location if that places us next to a monster 
-  if (!charxy(d->pc.position[dim_x] + dir[dim_x],
-	      d->pc.position[dim_y] + dir[dim_y]) &&
-      ((charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-	       d->pc.position[dim_y] + dir[dim_y] - 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-		d->pc.position[dim_y] + dir[dim_y] - 1) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-	       d->pc.position[dim_y] + dir[dim_y]) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-		d->pc.position[dim_y] + dir[dim_y]) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-	       d->pc.position[dim_y] + dir[dim_y] + 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] - 1,
-		d->pc.position[dim_y] + dir[dim_y] + 1) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x],
-	       d->pc.position[dim_y] + dir[dim_y] - 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x],
-		d->pc.position[dim_y] + dir[dim_y] - 1) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x],
-	       d->pc.position[dim_y] + dir[dim_y] + 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x],
-		d->pc.position[dim_y] + dir[dim_y] + 1) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-	       d->pc.position[dim_y] + dir[dim_y] - 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-		d->pc.position[dim_y] + dir[dim_y] - 1) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-	       d->pc.position[dim_y] + dir[dim_y]) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-		d->pc.position[dim_y] + dir[dim_y]) != &d->pc)) ||
-       (charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-	       d->pc.position[dim_y] + dir[dim_y] + 1) &&
-	(charxy(d->pc.position[dim_x] + dir[dim_x] + 1,
-		d->pc.position[dim_y] + dir[dim_y] + 1) != &d->pc)))) {
-    dir[dim_x] = dir[dim_y] = 0;
-  }
-  */
   
   return 0;
 }
