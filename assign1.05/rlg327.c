@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
   char *save_file;
   char *load_file;
   char *pgm_file;
-
+  
   memset(&d, 0, sizeof (d));
 
   /* Default behavior: Seed with the time, generate a new dungeon, *
@@ -216,13 +216,18 @@ int main(int argc, char *argv[])
 
   config_pc(&d);
   gen_monsters(&d);
+  
   initscr();
+  noecho();
+  curs_set(FALSE);
+  
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     //render_dungeon(&d);
     do_moves(&d);
     usleep(5000);
   }
-  render_dungeon(&d);
+  endwin();
+  //render_dungeon(&d);
 
   if (do_save) {
     write_dungeon(&d, save_file);
@@ -234,8 +239,7 @@ int main(int argc, char *argv[])
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
 
   pc_delete(d.pc.pc);
-
   delete_dungeon(&d);
-  endwin();
+
   return 0;
 }

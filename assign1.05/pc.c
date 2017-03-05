@@ -52,19 +52,75 @@ void config_pc(dungeon_t *d)
   dijkstra_tunnel(d);
 }
 
+void n_draw(dungeon_t *d, pair_t pos)
+{
+  int i;
+  int j;
+  pair_t p;
+  p[dim_y] = pos[dim_y];
+  p[dim_x] = pos[dim_x];
+  char ter;
+  clear();
+  
+  for(i = 0; i < 80; i++){
+    mvprintw(0, i, " ");
+  }
+  for(j = 1; j < 22; j++, p[dim_y]++){
+    p[dim_x] = pos[dim_x];
+    for(i = 0; i < 80; i++, p[dim_x]++){
+      if (charpair(p)) {
+	ter = charpair(p)->symbol;
+      } else {	
+	switch (mappair(p)) {
+	case ter_wall:
+	case ter_wall_immutable:
+	  ter = ' ';
+	  break;
+	case ter_floor:
+	case ter_floor_room:
+	  ter = '.';
+	  break;
+	case ter_floor_hall:
+	  ter = '#';
+	  break;
+	case ter_debug:
+	  ter = '*';
+	  fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+	  break;
+	case ter_stair_up:
+	  ter = '<';
+	  break;
+	case ter_stair_down:
+	  ter = '>';
+	  break;
+	}
+      }
+      mvprintw(j, i, "%c", ter);
+    }
+  }
+  mvprintw(22, 0, "PC is at x, y coordinate: (%i, %i)", d->pc.position[dim_x], d->pc.position[dim_y]);
+  mvprintw(23, 0, "Dungeon view is in x, y sector: (%i, %i)", (pos[dim_x]/80), (pos[dim_y]/21));
+ 
+  refresh();
+}
+
 /*
  * Modified pc_next_pos to ask for input for ncurses.
  */
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
 {
+  pair_t p;
+  p[dim_y] = 21 * (d->pc.position[dim_y] / 21);
+  p[dim_x] = 80 * (d->pc.position[dim_x] / 80);  
   char in;
   dir[dim_y] = dir[dim_x] = 0;
   int control = 1;
   int moved = 0;
   //render_dungeon(d);
   while(moved == 0){
-    render_dungeon(d);
+    //render_dungeon(d);
+    n_draw(d, p);
     in = getch();
     switch(in){
     case '7':
@@ -123,7 +179,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     case 'j':
       if(control == 1){
 	if(mapxy(d->pc.position[dim_x], d->pc.position[dim_y] + 1) >= ter_floor){
-	  dir[dim_y] = -1;
+	  dir[dim_y] = 1;
 	  moved = 1;
 	}
       } else {
