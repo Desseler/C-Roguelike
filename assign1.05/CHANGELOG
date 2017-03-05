@@ -1,3 +1,4 @@
 2-24: Created project. Imported Jeremy's code.
 2-27: Added stair generation
 3-3: Added PC movement and dungeon view in ncurses. Added Rest of input functions
+3-5: Finished debugging. Stairs now work properly. Kill and avenged count are persistent throughout floors and print to ncurses screen.	

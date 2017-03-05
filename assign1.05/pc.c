@@ -56,6 +56,8 @@ void config_pc(dungeon_t *d)
   dijkstra_tunnel(d);
 }
 
+/* Added n_draw method for ncurses */
+
 void n_draw(dungeon_t *d, pair_t pos)
 {
   int i;
@@ -103,7 +105,9 @@ void n_draw(dungeon_t *d, pair_t pos)
     }
   }
   mvprintw(22, 0, "PC is at x, y coordinate: (%i, %i)", d->pc.position[dim_x], d->pc.position[dim_y]);
+  mvprintw(22, 40, "Monsters killed: %i", d->pc.kills[kill_direct]);
   mvprintw(23, 0, "Dungeon view is in x, y sector: (%i, %i)", (pos[dim_x]/80), (pos[dim_y]/21));
+  mvprintw(23, 40, "Avenged: %i", d->pc.kills[kill_avenged]);
  
   refresh();
 }
@@ -229,18 +233,14 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       break;
     case '>':
       if(mappair(d->pc.position) == ter_stair_down){
-	gen_dungeon(d);
-	config_pc(d);
-	gen_monsters(d);
+	d->regen = 1;
 	moved = 1;
       }
       break;
     case '<':
       if(mappair(d->pc.position) == ter_stair_up){
-	gen_dungeon(d);
-	config_pc(d);
-	gen_monsters(d);
-	moved =1;
+	d->regen = 1;
+	moved = 1;
       }
       break;
     case 'L':

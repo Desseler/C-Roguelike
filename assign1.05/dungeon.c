@@ -11,6 +11,8 @@
 #include "utils.h"
 #include "heap.h"
 #include "event.h"
+#include "pc.h"
+#include "npc.h"
 
 typedef struct corridor_path {
   heap_node_t *hn;

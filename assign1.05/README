@@ -1,4 +1,12 @@
 Coms 327 assignment1.05. User interfaces with ncurses.h
+by Trevor Luster
 
 Uses Jeremy's code from assignment1.04.
+
+in pc.c:
+   Edited pc_next_pos to take input from user.
+   Added n_draw. Main method for drawing dungeon in ncurses. Also draws PC position, current viewed sector of dungeon, and PC kill/avenged count.
+
+in rlg327.c:
+   Edited move loop to check for dungeon regeneration variable. If regen == 1, regenerate dungeon by cleaning memory then reinitializing dungeon. Kill/avenged count are saved between regenerations.
 

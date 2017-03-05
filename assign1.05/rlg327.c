@@ -224,6 +224,19 @@ int main(int argc, char *argv[])
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     do_moves(&d);
     usleep(5000);
+    if(d.regen == 1){
+      uint32_t direct = d.pc.kills[kill_direct];
+      uint32_t avenged = d.pc.kills[kill_avenged];
+      pc_delete(d.pc.pc);
+      delete_dungeon(&d);
+      init_dungeon(&d);
+      gen_dungeon(&d);
+      config_pc(&d);
+      gen_monsters(&d);
+      d.pc.kills[kill_direct] = direct;
+      d.pc.kills[kill_avenged] = avenged;
+      d.regen = 0;
+    }
   }
   endwin();
 
