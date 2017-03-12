@@ -1,3 +1,9 @@
+#ifdef __cplusplus
+extern "C" {
+  #endif
+
+
+
 #ifndef UTILS_H
 # define UTILS_H
 
@@ -11,4 +17,10 @@
 
 int makedirectory(char *dir);
 
+#endif
+
+
+
+#ifdef __cplusplus
+}
 #endif

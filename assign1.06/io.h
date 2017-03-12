@@ -1,3 +1,9 @@
+#ifdef __cplusplus
+extern "C" {
+  #endif
+
+
+
 #ifndef IO_H
 # define IO_H
 
@@ -11,4 +17,10 @@ void io_queue_message(const char *format, ...);
 void io_calculate_offset(dungeon_t *d);
 void io_update_offset(dungeon_t *d);
 
+#endif
+
+
+
+#ifdef __cplusplus
+}
 #endif
