@@ -9,6 +9,7 @@
 #include "pc.h"
 #include "utils.h"
 #include "dungeon.h"
+#include "c-cpp-pc.h"
 
 /* Same ugly hack we did in path.c */
 static dungeon_t *dungeon;

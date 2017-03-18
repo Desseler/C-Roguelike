@@ -1,3 +1,7 @@
 # [2017-03-12]
 -Started project
 -Added Jeremy's 1.05 solution code to assignment
+
+# [2017-03-18]
+-Changed file type to .cpp for relevant .c files
+-Modified header files for C code

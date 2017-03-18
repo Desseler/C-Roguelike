@@ -1,3 +1,9 @@
+#ifdef __cplusplus
+extern "C" {
+    #endif
+  
+
+
 #ifndef DUNGEON_H
 # define DUNGEON_H
 
@@ -5,6 +11,8 @@
 # include "macros.h"
 # include "dims.h"
 # include "character.h"
+# include "c-cpp-character.h"
+  
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              105
@@ -91,3 +99,9 @@ void render_distance_map(dungeon_t *d);
 void render_tunnel_distance_map(dungeon_t *d);
 
 #endif
+
+
+#ifdef __cplusplus
+}
+#endif
+

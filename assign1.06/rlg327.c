@@ -8,6 +8,8 @@
 #include "npc.h"
 #include "move.h"
 #include "io.h"
+#include "c-cpp-pc.h"
+#include "c-cpp-npc.h"
 
 const char *victory =
   "                                       o\n"
