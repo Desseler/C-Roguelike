@@ -1,6 +1,6 @@
-#ifdef __cplusplus
-extern "C" {
-  #endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 
 
@@ -192,6 +192,6 @@ extern "C" {
 
 
 
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//}
+//#endif
