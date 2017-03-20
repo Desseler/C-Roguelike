@@ -1,6 +1,5 @@
 #include "event.h"
 #include "character.h"
-#include "c-cpp-character.h"
 
 static uint32_t next_event_number(void)
 {

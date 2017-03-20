@@ -1,8 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-  #endif
-
-  
 #ifndef DIMS_H
 # define DIMS_H
 
@@ -17,9 +12,4 @@ typedef enum dim {
 
 typedef int16_t pair_t[num_dims];
 
-#endif
-
-
-#ifdef __cplusplus
-}
 #endif

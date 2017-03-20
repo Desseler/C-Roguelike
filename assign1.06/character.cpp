@@ -9,10 +9,10 @@
 void character_delete(void *v)
 {
   /* The PC is never malloc()ed anymore, do don't attempt to free it here. */
-  character *c;
+  character_t *c;
 
   if (v) {
-    c = (character *) v;
+    c = v;
 
     if (c->npc) {
       npc_delete(c->npc);

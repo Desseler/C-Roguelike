@@ -14,9 +14,6 @@
 #include "path.h"
 #include "event.h"
 #include "io.h"
-#include "c-cpp-pc.h"
-#include "c-cpp-npc.h"
-#include "c-cpp-character.h"
 
 void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
