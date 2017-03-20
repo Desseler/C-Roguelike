@@ -7,8 +7,9 @@
 
 typedef struct dungeon dungeon_t;
 
-typedef struct pc {
-} pc_t;
+class pc {
+ public:
+};
 
 void pc_delete(pc_t *pc);
 uint32_t pc_is_alive(dungeon_t *d);

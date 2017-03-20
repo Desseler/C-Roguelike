@@ -16,7 +16,8 @@ typedef enum kill_type {
   num_kill_types
 } kill_type_t;
 
-typedef struct character {
+class character {
+ public:
   char symbol;
   pair_t position;
   int32_t speed;
@@ -32,11 +33,11 @@ typedef struct character {
   npc_t *npc;
   pc_t *pc;
   uint32_t kills[num_kill_types];
-} character_t;
+};
 
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
-uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist);
+uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
 void character_delete(void *c);
 
 #endif
