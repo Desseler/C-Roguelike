@@ -9,12 +9,48 @@
 #include "event.h"
 #include "pc.h"
 
+
+npc::npc(npc_characteristics_t chars)
+{
+  characteristics = chars;
+}
+
+npc_characteristics_t npc::getCharacteristics()
+{
+  return characteristics;
+}
+
+uint32_t npc::getSeenPC()
+{
+  return have_seen_pc;
+}
+
+pair_t npc::getLastKnownPC()
+{
+  return pc_last_known_position;
+}
+
+void npc::setSeenPC(uint32_t seen)
+{
+  have_seen_pc = seen;
+}
+
+void npc::setLastKnownPC(pair_t pair)
+{
+  pc_last_known_position = pair;
+}
+
+
+
+
+/*
 void npc_delete(npc_t *n)
 {
   if (n) {
     free(n);
   }
 }
+*/
 
 static uint32_t max_monster_cells(dungeon_t *d)
 {

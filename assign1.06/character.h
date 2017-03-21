@@ -29,34 +29,34 @@ class character {
    * metadata: locally, how old is this character; and globally, how many   *
    * characters have been created by the game.                              */
   uint32_t sequence_number;
-  npc *npc;
-  pc *pc;
+  //npc *npc;
+  //pc *pc;
   uint32_t kills[num_kill_types];
 
  public:
-  character(char sym, pair_t pos, int32_t spd, uint32_t seq, npc *npc_character, pc *pc_character) {};
+  character(char sym, pair_t pos, int32_t spd, uint32_t seq) {};
 
-  uint32_t can_see(dungeon_t *d, character *exhibitionist);
-  void character_delete(void *c);
   char getSymbol();
   pair_t getPosition();
   int32_t getSpeed();
   uint32_t getAlive();
   uint32_t getSequenceNumber();
-  npc* getNpc();
-  pc* getPc();
+  //npc* getNpc();
+  //pc* getPc();
   uint32_t getKills(num_kill_types num);
 
   void setPosition(pair_t pos);
   void kill();
   void increaseKill(num_kill_types num);
+
+  ~character();
 };
 
 
 
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
-uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist);
-void character_delete(void *c);
+uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
+//void character_delete(void *c);
 
 #endif
