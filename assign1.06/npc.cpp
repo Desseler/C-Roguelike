@@ -40,6 +40,31 @@ void npc::setLastKnownPC(pair_t pair)
   pc_last_known_position = pair;
 }
 
+npc_characteristics_t getNpcCharacteristics(npc *ch)
+{
+  return ch->getCharacteristics();
+}
+
+uint32_t getNpcSeenPC(npc *ch)
+{
+  return ch->getSeenPC();
+}
+
+pair_t getNpcLastKnownPC(npc *ch)
+{
+  return ch->getLastKnownPC();
+}
+
+void setNpcSeenPC(npc *ch, uint32_t seen)
+{
+  ch->setSeenPC(seen);
+}
+
+void setNpcLastKnownPC(npc *ch, pair_t pair)
+{
+  ch->setLastKnownPC(pair);
+}
+
 
 
 

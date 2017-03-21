@@ -220,5 +220,4 @@ void killChar(character *ch)
 
 void increaseCharKill(character *ch, num_kill_types num)
 {
-  ch->increaseKill(num);
 }
