@@ -6,7 +6,21 @@
 #include "pc.h"
 #include "dungeon.h"
 
-void character_delete(void *v)
+
+
+character(char sym, pair_t pos, int32_t spd, uint32_t seq, npc *npc_character, pc *pc_character)
+{
+  symbol = sym;
+  position = pos;
+  speed = spd;
+  alive = 1;
+  sequence_number = seq;
+  npc = npc_character;
+  pc = pc_character;
+}
+
+
+void character::character_delete(void *v)
 {
   /* The PC is never malloc()ed anymore, do don't attempt to free it here. */
   character_t *c;
@@ -21,7 +35,7 @@ void character_delete(void *v)
   }
 }
 
-uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)
+uint32_t character::can_see(dungeon_t *d, character_t *exhibitionist)
 {
   /* Application of Bresenham's Line Drawing Algorithm.  If we can draw *
    * a line from v to e without intersecting any walls, then v can see  *
@@ -105,4 +119,59 @@ uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)
   }
 
   return 1;
+}
+
+char character::getSymbol()
+{
+  return symbol;
+}
+
+pair_t character::getPosition()
+{
+  return position;
+}
+
+int32_t character::getSpeed()
+{
+  return speed;
+}
+
+uint32_t character::getAlive()
+{
+  return alive;
+}
+
+uint32_t character::getSequenceNumber()
+{
+  return sequence_number;
+}
+
+npc* character::getNpc()
+{
+  return npc;
+}
+
+pc* character::getPc()
+{
+  return pc;
+}
+
+uint32_t character::getKills(num_kill_types num)
+{
+  return kills[num];
+}
+
+void character::setPosition(pair_t pos)
+{
+  position = pos;
+}
+  
+void character::kill()
+{
+  alive = 0;
+}
+
+void character::increaseKill(num_kill_types num)
+{
+  kills[num]++;
 }
