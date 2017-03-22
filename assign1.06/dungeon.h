@@ -5,6 +5,7 @@
 # include "macros.h"
 # include "dims.h"
 # include "character.h"
+# include "pc.h"
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              105
@@ -24,6 +25,7 @@
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
+#define pcmapxy(x, y) (d->pc->map[y][x])
 #define hardnesspair(pair) (d->hardness[pair[dim_y]][pair[dim_x]])
 #define hardnessxy(x, y) (d->hardness[y][x])
 #define charpair(pair) (d->character[pair[dim_y]][pair[dim_x]])
@@ -64,7 +66,7 @@ typedef struct dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   character_t * character[DUNGEON_Y][DUNGEON_X];
-  pc_t pc;
+  pc_t * pc;
   heap_t events;
   uint16_t num_monsters;
   uint16_t max_monsters;
@@ -79,6 +81,9 @@ typedef struct dungeon {
   pair_t io_offset;
 } dungeon_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void init_dungeon(dungeon_t *d);
 void new_dungeon(dungeon_t *d);
 void delete_dungeon(dungeon_t *d);
@@ -89,5 +94,8 @@ int read_dungeon(dungeon_t *d, char *file);
 int read_pgm(dungeon_t *d, char *pgm);
 void render_distance_map(dungeon_t *d);
 void render_tunnel_distance_map(dungeon_t *d);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

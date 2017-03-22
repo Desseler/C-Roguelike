@@ -210,7 +210,7 @@ void io_display(dungeon_t *d)
         mvaddch(y + 1, x, d->character[d->io_offset[dim_y] + y]
                                       [d->io_offset[dim_x] + x]->symbol);
       } else {
-        switch (mapxy(d->io_offset[dim_x] + x,
+        switch (pcmapxy(d->io_offset[dim_x] + x,
                       d->io_offset[dim_y] + y)) {
         case ter_wall:
         case ter_wall_immutable:

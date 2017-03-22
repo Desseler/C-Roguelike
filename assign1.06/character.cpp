@@ -165,6 +165,12 @@ void character_t::increaseKill(kill_type_t num)
   kills[num]++;
 }
 
+void character_delete(character_t *c)
+{
+  if (c) {
+    delete c;
+  }
+}
 
 char getCharSymbol(character_t *ch)
 {

@@ -9,6 +9,15 @@
 /* Returns random integer in [min, max]. */
 # define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 
+#ifdef __cplusplus
+extern "C" {
+#endif  
+
 int makedirectory(char *dir);
 
+#ifdef __cplusplus
+}
+#endif
+    
+  
 #endif

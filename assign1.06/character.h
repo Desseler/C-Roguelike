@@ -6,8 +6,6 @@
 # include "dims.h"
 
 typedef struct dungeon dungeon_t;
-//typedef struct npc npc_t;
-//typedef struct pc pc_t;
 typedef struct dice_t dice_t;
 
 typedef enum kill_type {
@@ -44,8 +42,6 @@ class character_t {
   int32_t getSpeed();
   uint32_t getAlive();
   uint32_t getSequenceNumber();
-  //npc* getNpc();
-  //pc* getPc();
   uint32_t getKills(kill_type_t num);
 
   void setPositionX(int16_t pos);
@@ -55,7 +51,8 @@ class character_t {
 
   ~character_t();
 };
-
+#else
+typedef void character_t;
 #endif
 
 #ifdef __cplusplus
@@ -65,7 +62,7 @@ extern "C" {
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
 uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist);
-//void character_delete(void *c);
+void character_delete(character_t *c);
 
 
 char getCharSymbol(character_t *ch);

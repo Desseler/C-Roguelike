@@ -215,6 +215,8 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
   }
 
+  d.pc = pc_create();
+
   config_pc(&d);
   gen_monsters(&d);
 
@@ -239,7 +241,7 @@ int main(int argc, char *argv[])
          "You avenged the cruel and untimely murders of %u peaceful dungeon residents.\n",
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
 
-  pc_delete(d.pc.pc);
+  pc_delete(d.pc);
 
   delete_dungeon(&d);
 
