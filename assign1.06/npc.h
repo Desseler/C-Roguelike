@@ -59,7 +59,8 @@ class npc : public character {
   
   npc_characteristics_t getCharacteristics();
   uint32_t getSeenPC();
-  pair_t getLastKnownPC();
+  int16_t getLastKnownPCX();
+  int16_t getLastKnownPCY();
 
   void setSeenPC(uint32_t seen);
   void setLastKnownPC(pair_t pair);
@@ -79,7 +80,8 @@ uint32_t dungeon_has_npcs(dungeon_t *d);
 
 npc_characteristics_t getNpcCharacteristics(npc *ch);
 uint32_t getNpcSeenPC(npc *ch);
-pair_t getNpcLastKnownPC(npc *ch);
+int16_t getNpcLastKnownPCX(npc *ch);
+int16_t getNpcLastKnownPCY(npc *ch);
 
 void setNpcSeenPC(npc *ch, uint32_t seen);
 void setNpcLastKnownPC(npc *ch, pair_t pair);

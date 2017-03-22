@@ -30,9 +30,14 @@ uint32_t npc::getSeenPC()
   return have_seen_pc;
 }
 
-pair_t npc::getLastKnownPC()
+int16_t npc::getLastKnownPCX()
 {
-  return pc_last_known_position;
+  return pc_last_known_position[dim_x];
+}
+
+int16_t npc::getLastKnownPCY()
+{
+  return pc_last_known_position[dim_y];
 }
 
 void npc::setSeenPC(uint32_t seen)
@@ -55,9 +60,14 @@ uint32_t getNpcSeenPC(npc *ch)
   return ch->getSeenPC();
 }
 
-pair_t getNpcLastKnownPC(npc *ch)
+int16_t getNpcLastKnownPCX(npc *ch)
 {
-  return ch->getLastKnownPC();
+  return ch->getLastKnownPCX();
+}
+
+int16_t getNpcLastKnownPCY(npc *ch)
+{
+  return ch->getLastKnownPCY();
 }
 
 void setNpcSeenPC(npc *ch, uint32_t seen)

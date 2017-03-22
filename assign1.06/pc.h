@@ -11,7 +11,7 @@ typedef struct dungeon dungeon_t;
 
 #ifdef __cplusplus
 
-class pc : public character {
+class pc_t : public character {
  
 };
 

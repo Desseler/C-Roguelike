@@ -9,3 +9,8 @@
 # [2017-03-20]
 -Restarted project
 -Implemented character as a class. Still needs constructor and destructor
+
+# [2017-03-22]
+-Finished character, npc, and pc classes
+-Added accessors and mutators for created classes to be used by C code
+-Added extern C for name mangling

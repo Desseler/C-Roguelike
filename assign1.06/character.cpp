@@ -14,10 +14,11 @@ character::character()
   sequence_number = 0;
 }
 
-character::character(char sym, pair_t pos, int32_t spd, uint32_t seq, npc *npc_character, pc *pc_character)
+character::character(char sym, pair_t pos, int32_t spd, uint32_t seq)
 {
   symbol = sym;
-  position = pos;
+  position[dim_y] = pos[dim_y];
+  position[dim_x] = pos[dim_x];
   speed = spd;
   alive = 1;
   sequence_number = seq;
@@ -42,7 +43,7 @@ void character_delete(void *v)
 }
 */
 
-uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
+uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist)
 {
   /* Application of Bresenham's Line Drawing Algorithm.  If we can draw *
    * a line from v to e without intersecting any walls, then v can see  *
@@ -133,9 +134,14 @@ char character::getSymbol()
   return symbol;
 }
 
-pair_t character::getPosition()
+int16_t character::getPositionX()
 {
-  return position;
+  return position[dim_x];
+}
+
+int16_t character::getPositionY()
+{
+  return position[dim_y];
 }
 
 int32_t character::getSpeed()
@@ -163,14 +169,19 @@ uint32_t character::getSequenceNumber()
 //  return pc;
 //}
 
-uint32_t character::getKills(num_kill_types num)
+uint32_t character::getKills(kill_type_t num)
 {
   return kills[num];
 }
 
-void character::setPosition(pair_t pos)
+void character::setPositionX(int16_t pos)
 {
-  position = pos;
+  position[dim_x] = pos;
+}
+
+void character::setPositionY(int16_t pos)
+{
+  position[dim_y] = pos;
 }
   
 void character::kill()
@@ -178,7 +189,7 @@ void character::kill()
   alive = 0;
 }
 
-void character::increaseKill(num_kill_types num)
+void character::increaseKill(kill_type_t num)
 {
   kills[num]++;
 }
@@ -189,9 +200,14 @@ char getCharSymbol(character *ch)
   return ch->getSymbol();
 }
 
-pair_t getCharPosition(character *ch)
+int16_t getCharPositionX(character *ch)
 {
-  return ch->getPosition();
+  return ch->getPositionX();
+}
+
+int16_t getCharPositionY(character *ch)
+{
+  return ch->getPositionY();
 }
 
 int32_t getCharSpeed(character *ch)
@@ -209,14 +225,19 @@ uint32_t getCharSequenceNumber(character *ch)
   return ch-> getSequenceNumber();
 }
 
-uint32_t getCharKills(character *ch, num_kill_types num)
+uint32_t getCharKills(character *ch, kill_type_t num)
 {
   return ch->getKills(num);
 }
 
-void setCharPosition(character *ch, pair_t pos)
+void setCharPositionX(character *ch, int16_t pos)
 {
-  ch->setPosition(pos);
+  ch->setPositionX(pos);
+}
+
+void setCharPositionY(character *ch, int16_t pos)
+{
+  ch->setPositionY(pos);
 }
 
 void killChar(character *ch)
@@ -224,7 +245,7 @@ void killChar(character *ch)
   ch->kill();
 }
 
-void increaseCharKill(character *ch, num_kill_types num)
+void increaseCharKill(character *ch, kill_type_t num)
 {
   ch->increaseKill(num);
 }

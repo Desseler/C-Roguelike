@@ -6,8 +6,8 @@
 # include "dims.h"
 
 typedef struct dungeon dungeon_t;
-typedef struct npc npc_t;
-typedef struct pc pc_t;
+//typedef struct npc npc_t;
+//typedef struct pc pc_t;
 typedef struct dice_t dice_t;
 
 typedef enum kill_type {
@@ -19,7 +19,7 @@ typedef enum kill_type {
 #ifdef __cplusplus
 
 class character {
- protected:
+ public:
   char symbol;
   pair_t position;
   int32_t speed;
@@ -36,22 +36,24 @@ class character {
   //pc *pc;
   uint32_t kills[num_kill_types];
 
- public:
-  character() {};
-  character(char sym, pair_t pos, int32_t spd, uint32_t seq) {};
+
+  character();
+  character(char sym, pair_t pos, int32_t spd, uint32_t seq);
 
   char getSymbol();
-  pair_t getPosition();
+  int16_t getPositionX();
+  int16_t getPositionY();
   int32_t getSpeed();
   uint32_t getAlive();
   uint32_t getSequenceNumber();
   //npc* getNpc();
   //pc* getPc();
-  uint32_t getKills(num_kill_types num);
+  uint32_t getKills(kill_type_t num);
 
-  void setPosition(pair_t pos);
+  void setPositionX(int16_t pos);
+  void setPositionY(int16_t pos);
   void kill();
-  void increaseKill(num_kill_types num);
+  void increaseKill(kill_type_t num);
 
   ~character();
 };
@@ -69,15 +71,17 @@ uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
 
 
 char getCharSymbol(character *ch);
-pair_t getCharPosition(character *ch);
+int16_t getCharPositionX(character *ch);
+int16_t getCharPositionY(character *ch);  
 int32_t getCharSpeed(character *ch);
 uint32_t getCharAlive(character *ch);
 uint32_t getCharSequenceNumber(character *ch);
-uint32_t getCharKills(character *ch, num_kill_types num);
+uint32_t getCharKills(character *ch, kill_type_t num);
 
-void setCharPosition(character *ch, pair_t pos);
+void setCharPositionY(character *ch, int16_t pos);
+void setCharPositionY(character *ch, int16_t pos);
 void killChar(character *ch);
-void increaseCharKill(character *ch, num_kill_types num);
+void increaseCharKill(character *ch, kill_type_t num);
 
 #ifdef __cplusplus
 }
