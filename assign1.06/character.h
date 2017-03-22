@@ -18,7 +18,7 @@ typedef enum kill_type {
 
 #ifdef __cplusplus
 
-class character {
+class character_t {
  public:
   char symbol;
   pair_t position;
@@ -32,13 +32,11 @@ class character {
    * metadata: locally, how old is this character; and globally, how many   *
    * characters have been created by the game.                              */
   uint32_t sequence_number;
-  //npc *npc;
-  //pc *pc;
   uint32_t kills[num_kill_types];
 
 
-  character();
-  character(char sym, pair_t pos, int32_t spd, uint32_t seq);
+  character_t();
+  character_t(char sym, pair_t pos, int32_t spd, uint32_t seq);
 
   char getSymbol();
   int16_t getPositionX();
@@ -55,7 +53,7 @@ class character {
   void kill();
   void increaseKill(kill_type_t num);
 
-  ~character();
+  ~character_t();
 };
 
 #endif
@@ -66,22 +64,22 @@ extern "C" {
 
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
-uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
+uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist);
 //void character_delete(void *c);
 
 
-char getCharSymbol(character *ch);
-int16_t getCharPositionX(character *ch);
-int16_t getCharPositionY(character *ch);  
-int32_t getCharSpeed(character *ch);
-uint32_t getCharAlive(character *ch);
-uint32_t getCharSequenceNumber(character *ch);
-uint32_t getCharKills(character *ch, kill_type_t num);
+char getCharSymbol(character_t *ch);
+int16_t getCharPositionX(character_t *ch);
+int16_t getCharPositionY(character_t *ch);  
+int32_t getCharSpeed(character_t *ch);
+uint32_t getCharAlive(character_t *ch);
+uint32_t getCharSequenceNumber(character_t *ch);
+uint32_t getCharKills(character_t *ch, kill_type_t num);
 
-void setCharPositionY(character *ch, int16_t pos);
-void setCharPositionY(character *ch, int16_t pos);
-void killChar(character *ch);
-void increaseCharKill(character *ch, kill_type_t num);
+void setCharPositionY(character_t *ch, int16_t pos);
+void setCharPositionY(character_t *ch, int16_t pos);
+void killChar(character_t *ch);
+void increaseCharKill(character_t *ch, kill_type_t num);
 
 #ifdef __cplusplus
 }

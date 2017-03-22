@@ -6,7 +6,7 @@
 #include "pc.h"
 #include "dungeon.h"
 
-character::character()
+character_t::character_t()
 {
   symbol = '0';
   speed = 10;
@@ -14,7 +14,7 @@ character::character()
   sequence_number = 0;
 }
 
-character::character(char sym, pair_t pos, int32_t spd, uint32_t seq)
+character_t::character_t(char sym, pair_t pos, int32_t spd, uint32_t seq)
 {
   symbol = sym;
   position[dim_y] = pos[dim_y];
@@ -22,28 +22,9 @@ character::character(char sym, pair_t pos, int32_t spd, uint32_t seq)
   speed = spd;
   alive = 1;
   sequence_number = seq;
-  //npc = npc_character;
-  //pc = pc_character;
 }
 
-/*
-void character_delete(void *v)
-{
-  // The PC is never malloc()ed anymore, do don't attempt to free it here. 
-  character_t *c;
-
-  if (v) {
-    c = v;
-
-    if (c->npc) {
-      npc_delete(c->npc);
-      free(c);
-    }
-  }
-}
-*/
-
-uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist)
+uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)
 {
   /* Application of Bresenham's Line Drawing Algorithm.  If we can draw *
    * a line from v to e without intersecting any walls, then v can see  *
@@ -129,123 +110,120 @@ uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist)
   return 1;
 }
 
-char character::getSymbol()
+char character_t::getSymbol()
 {
   return symbol;
 }
 
-int16_t character::getPositionX()
+int16_t character_t::getPositionX()
 {
   return position[dim_x];
 }
 
-int16_t character::getPositionY()
+int16_t character_t::getPositionY()
 {
   return position[dim_y];
 }
 
-int32_t character::getSpeed()
+int32_t character_t::getSpeed()
 {
   return speed;
 }
 
-uint32_t character::getAlive()
+uint32_t character_t::getAlive()
 {
   return alive;
 }
 
-uint32_t character::getSequenceNumber()
+uint32_t character_t::getSequenceNumber()
 {
   return sequence_number;
 }
 
-//npc* character::getNpc()
-//{
-//  return npc;
-//}
-
-//pc* character::getPc()
-//{
-//  return pc;
-//}
-
-uint32_t character::getKills(kill_type_t num)
+uint32_t character_t::getKills(kill_type_t num)
 {
   return kills[num];
 }
 
-void character::setPositionX(int16_t pos)
+void character_t::setPositionX(int16_t pos)
 {
   position[dim_x] = pos;
 }
 
-void character::setPositionY(int16_t pos)
+void character_t::setPositionY(int16_t pos)
 {
   position[dim_y] = pos;
 }
   
-void character::kill()
+void character_t::kill()
 {
   alive = 0;
 }
 
-void character::increaseKill(kill_type_t num)
+void character_t::increaseKill(kill_type_t num)
 {
   kills[num]++;
 }
 
 
-char getCharSymbol(character *ch)
+char getCharSymbol(character_t *ch)
 {
   return ch->getSymbol();
 }
 
-int16_t getCharPositionX(character *ch)
+int16_t getCharPositionX(character_t *ch)
 {
   return ch->getPositionX();
 }
 
-int16_t getCharPositionY(character *ch)
+int16_t getCharPositionY(character_t *ch)
 {
   return ch->getPositionY();
 }
 
-int32_t getCharSpeed(character *ch)
+int32_t getCharSpeed(character_t *ch)
 {
   return ch->getSpeed();
 }
 
-uint32_t getCharAlive(character *ch)
+uint32_t getCharAlive(character_t *ch)
 {
   return ch->getAlive();
 }
 
-uint32_t getCharSequenceNumber(character *ch)
+uint32_t getCharSequenceNumber(character_t *ch)
 {
   return ch-> getSequenceNumber();
 }
 
-uint32_t getCharKills(character *ch, kill_type_t num)
+uint32_t getCharKills(character_t *ch, kill_type_t num)
 {
   return ch->getKills(num);
 }
 
-void setCharPositionX(character *ch, int16_t pos)
+void setCharPositionX(character_t *ch, int16_t pos)
 {
   ch->setPositionX(pos);
 }
 
-void setCharPositionY(character *ch, int16_t pos)
+void setCharPositionY(character_t *ch, int16_t pos)
 {
   ch->setPositionY(pos);
 }
 
-void killChar(character *ch)
+void killChar(character_t *ch)
 {
   ch->kill();
 }
 
-void increaseCharKill(character *ch, kill_type_t num)
+void increaseCharKill(character_t *ch, kill_type_t num)
 {
   ch->increaseKill(num);
+}
+
+
+
+int main()
+{
+  return 0;
 }

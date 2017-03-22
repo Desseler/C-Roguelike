@@ -168,3 +168,9 @@ uint32_t pc_in_room(dungeon_t *d, uint32_t room)
 
   return 0;
 }
+
+
+int main()
+{
+  return 0;
+}

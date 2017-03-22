@@ -5,6 +5,7 @@
 
 # include "dims.h"
 # include "character.h"
+# include "pc.h"
 
 # define NPC_SMART         0x00000001
 # define NPC_TELEPATH      0x00000002
@@ -43,19 +44,18 @@
   ((character)->npc->characteristics & NPC_##bit)
 
 typedef struct dungeon dungeon_t;
-class character;
 typedef uint32_t npc_characteristics_t;
 
 #ifdef __cplusplus
 
-class npc : public character {
- protected:
+class npc_t : public character_t {
+ public:
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
  public:
-  npc() {};
-  npc(char sym, pair_t pos, int32_t spd, uint32_t seq, npc_characteristics_t chars){};
+  npc_t();
+  npc_t(char sym, pair_t pos, int32_t spd, uint32_t seq, npc_characteristics_t chars);
   
   npc_characteristics_t getCharacteristics();
   uint32_t getSeenPC();
@@ -78,13 +78,13 @@ void gen_monsters(dungeon_t *d);
 void npc_next_pos(dungeon_t *d, character *c, pair_t next);
 uint32_t dungeon_has_npcs(dungeon_t *d);
 
-npc_characteristics_t getNpcCharacteristics(npc *ch);
-uint32_t getNpcSeenPC(npc *ch);
-int16_t getNpcLastKnownPCX(npc *ch);
-int16_t getNpcLastKnownPCY(npc *ch);
+npc_characteristics_t getNpcCharacteristics(npc_t *ch);
+uint32_t getNpcSeenPC(npc_t *ch);
+int16_t getNpcLastKnownPCX(npc_t *ch);
+int16_t getNpcLastKnownPCY(npc_t *ch);
 
-void setNpcSeenPC(npc *ch, uint32_t seen);
-void setNpcLastKnownPC(npc *ch, pair_t pair);
+void setNpcSeenPC(npc_t *ch, uint32_t seen);
+void setNpcLastKnownPC(npc_t *ch, pair_t pair);
 
 #ifdef __cplusplus
 }
