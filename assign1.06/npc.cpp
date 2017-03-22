@@ -10,8 +10,13 @@
 #include "pc.h"
 
 
-npc::npc(npc_characteristics_t chars)
+npc::npc(char sym, pair_t pos, int32_t spd, uint32_t seq, npc_characteristics_t chars)
 {
+  symbol = sym;
+  position = pos;
+  speed = spd;
+  alive = 1;
+  sequence_number = seq;
   characteristics = chars;
 }
 

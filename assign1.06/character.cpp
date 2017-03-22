@@ -6,7 +6,13 @@
 #include "pc.h"
 #include "dungeon.h"
 
-
+character::character()
+{
+  symbol = '0';
+  speed = 10;
+  alive = 1;
+  sequence_number = 0;
+}
 
 character::character(char sym, pair_t pos, int32_t spd, uint32_t seq, npc *npc_character, pc *pc_character)
 {

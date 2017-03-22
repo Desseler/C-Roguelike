@@ -2,6 +2,7 @@
 
 #include "string.h"
 
+#include "character.h"
 #include "dungeon.h"
 #include "pc.h"
 #include "utils.h"
@@ -9,12 +10,14 @@
 #include "path.h"
 #include "io.h"
 
+/*
 void pc_delete(pc_t *pc)
 {
   if (pc) {
     free(pc);
   }
 }
+*/
 
 uint32_t pc_is_alive(dungeon_t *d)
 {

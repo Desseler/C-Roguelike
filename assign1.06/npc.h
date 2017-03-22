@@ -46,12 +46,16 @@ typedef struct dungeon dungeon_t;
 class character;
 typedef uint32_t npc_characteristics_t;
 
+#ifdef __cplusplus
+
 class npc : public character {
+ protected:
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
  public:
-  npc(npc_characteristics_t chars){};
+  npc() {};
+  npc(char sym, pair_t pos, int32_t spd, uint32_t seq, npc_characteristics_t chars){};
   
   npc_characteristics_t getCharacteristics();
   uint32_t getSeenPC();
@@ -60,8 +64,13 @@ class npc : public character {
   void setSeenPC(uint32_t seen);
   void setLastKnownPC(pair_t pair);
 
-  ~npc();
 };
+
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void gen_monsters(dungeon_t *d);
 //void npc_delete(npc_t *n);
@@ -75,5 +84,9 @@ pair_t getNpcLastKnownPC(npc *ch);
 void setNpcSeenPC(npc *ch, uint32_t seen);
 void setNpcLastKnownPC(npc *ch, pair_t pair);
 
+#ifdef __cplusplus
+}
+#endif
+    
 
 #endif

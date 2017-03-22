@@ -19,6 +19,7 @@ typedef enum kill_type {
 #ifdef __cplusplus
 
 class character {
+ protected:
   char symbol;
   pair_t position;
   int32_t speed;
@@ -36,6 +37,7 @@ class character {
   uint32_t kills[num_kill_types];
 
  public:
+  character() {};
   character(char sym, pair_t pos, int32_t spd, uint32_t seq) {};
 
   char getSymbol();
@@ -56,6 +58,10 @@ class character {
 
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2);
 uint32_t can_see(dungeon_t *d, character *voyeur, character *exhibitionist);
@@ -73,5 +79,9 @@ void setCharPosition(character *ch, pair_t pos);
 void killChar(character *ch);
 void increaseCharKill(character *ch, num_kill_types num);
 
+#ifdef __cplusplus
+}
+#endif
+ 
 
 #endif
