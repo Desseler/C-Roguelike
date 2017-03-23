@@ -6,7 +6,7 @@
 
 #include "dungeon.h"
 #include "heap.h"
-#include "move.h"
+
 #include "npc.h"
 #include "pc.h"
 #include "character.h"
@@ -17,34 +17,34 @@
 
 void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
-  if (def->alive) {
-    def->alive = 0;
-    if (def != &d->pc) {
-      d->num_monsters--;
-    }
-    atk->kills[kill_direct]++;
-    atk->kills[kill_avenged] += (def->kills[kill_direct] +
-                                  def->kills[kill_avenged]);
+  
+  killChar(def);
+  if (def != &d->pc) {
+    d->num_monsters--;
   }
+  increaseCharKills(atk, kill_direct);
+  setCharKills(atk, kill_avenged, (getCharKills(atk, kill_avenged) + (getCharKills(def, kill_direct) +
+								      getCharKills(def, kill_avenged))));
+		 
 
   if (atk == &d->pc) {
-    io_queue_message("You smite the %c", def->symbol);
+    io_queue_message("You smite the %c", getCharSymbol(def));
   }
 }
 
 void move_character(dungeon_t *d, character_t *c, pair_t next)
 {
   if (charpair(next) &&
-      ((next[dim_y] != c->position[dim_y]) ||
-       (next[dim_x] != c->position[dim_x]))) {
+      ((next[dim_y] != getCharPositionY(c)) ||
+       (next[dim_x] != getCharPositionX(c)))) {
     do_combat(d, c, charpair(next));
   } else {
     /* No character in new position. */
 
-    d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-    c->position[dim_y] = next[dim_y];
-    c->position[dim_x] = next[dim_x];
-    d->character[c->position[dim_y]][c->position[dim_x]] = c;
+    d->character[getCharPositionY(c)][getCharPositionX(c)] = NULL;
+    setCharPositionY(c, next[dim_y]);    
+    setCharPositionX(c, next[dim_x]);
+    d->character[getCharPositionY(c)][getCharPositionX(c)] = c;
   }
 }
 
@@ -67,7 +67,7 @@ void do_moves(dungeon_t *d)
     /* The next line is buggy.  Monsters get first turn before PC.  *
      * Monster gen code always leaves PC in a monster-free room, so *
      * not a big issue, but it needs a better solution.             */
-    e->time = d->time + (1000 / d->pc.speed)
+    e->time = d->time + (1000 / getCharSpeed(d->pc))
 ;
     e->sequence = 0;
     e->c = &d->pc;
@@ -81,9 +81,9 @@ void do_moves(dungeon_t *d)
     if (e->type == event_character_turn) {
       c = e->c;
     }
-    if (!c->alive) {
-      if (d->character[c->position[dim_y]][c->position[dim_x]] == c) {
-        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+    if (!getCharAlive(c)) {
+      if (d->character[getCharPositionY(c)][getCharPositionX(c)] == c) {
+        d->character[getCharPositionY(c)][getCharPositionX(c)] = NULL;
       }
       if (c != &d->pc) {
         event_delete(e);
@@ -94,7 +94,7 @@ void do_moves(dungeon_t *d)
     npc_next_pos(d, c, next);
     move_character(d, c, next);
 
-    heap_insert(&d->events, update_event(d, e, 1000 / c->speed));
+    heap_insert(&d->events, update_event(d, e, 1000 / getCharSpeed(c)));
   }
 
   io_display(d);
@@ -106,6 +106,12 @@ void do_moves(dungeon_t *d)
      * and recreated every time we leave and re-enter this function.    */
     e->c = NULL;
     event_delete(e);
+    /* Implementation of Fog of War */
+    for(int j = getCharPositionY(d->pc) - 5; j < getCharPositionY(d->pc) + 6; j++){
+      for(int i = getCharPositionX(d->pc) - 5; i < getCharPositionX(d->pc) + 6; i++){
+	pcmapxy(i, j) = mapxy(i, j);
+      }
+    }
     io_handle_input(d);
   }
 }
@@ -114,24 +120,24 @@ void dir_nearest_wall(dungeon_t *d, character_t *c, pair_t dir)
 {
   dir[dim_x] = dir[dim_y] = 0;
 
-  if (c->position[dim_x] != 1 && c->position[dim_x] != DUNGEON_X - 2) {
-    dir[dim_x] = (c->position[dim_x] > DUNGEON_X - c->position[dim_x] ? 1 : -1);
+  if (getCharPositionX(c) != 1 && getCharPositionX(c) != DUNGEON_X - 2) {
+    dir[dim_x] = (getCharPositionX(c) > DUNGEON_X - getCharPositionX(c) ? 1 : -1);
   }
-  if (c->position[dim_y] != 1 && c->position[dim_y] != DUNGEON_Y - 2) {
-    dir[dim_y] = (c->position[dim_y] > DUNGEON_Y - c->position[dim_y] ? 1 : -1);
+  if (getCharPositionY(c) != 1 && getCharPositionY(c) != DUNGEON_Y - 2) {
+    dir[dim_y] = (getCharPositionY(c) > DUNGEON_Y - getCharPositionY(c) ? 1 : -1);
   }
 }
 
 uint32_t against_wall(dungeon_t *d, character_t *c)
 {
-  return ((mapxy(c->position[dim_x] - 1,
-                 c->position[dim_y]    ) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x] + 1,
-                 c->position[dim_y]    ) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x]    ,
-                 c->position[dim_y] - 1) == ter_wall_immutable) ||
-          (mapxy(c->position[dim_x]    ,
-                 c->position[dim_y] + 1) == ter_wall_immutable));
+  return ((mapxy(getCharPositionX(c) - 1,
+                 getCharPositionY(c)    ) == ter_wall_immutable) ||
+          (mapxy(getCharPositionX(c) + 1,
+                 getCharPositionY(c)    ) == ter_wall_immutable) ||
+          (mapxy(getCharPositionX(c)    ,
+                 getCharPositionY(c) - 1) == ter_wall_immutable) ||
+          (mapxy(getCharPositionX(c)    ,
+                 getCharPositionY(c) + 1) == ter_wall_immutable));
 }
 
 uint32_t in_corner(dungeon_t *d, character_t *c)
@@ -140,14 +146,14 @@ uint32_t in_corner(dungeon_t *d, character_t *c)
 
   num_immutable = 0;
 
-  num_immutable += (mapxy(c->position[dim_x] - 1,
-                          c->position[dim_y]    ) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x] + 1,
-                          c->position[dim_y]    ) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x]    ,
-                          c->position[dim_y] - 1) == ter_wall_immutable);
-  num_immutable += (mapxy(c->position[dim_x]    ,
-                          c->position[dim_y] + 1) == ter_wall_immutable);
+  num_immutable += (mapxy(getCharPositionX(c) - 1,
+                          getCharPositionY(c)    ) == ter_wall_immutable);
+  num_immutable += (mapxy(getCharPositionX(c) + 1,
+                          getCharPositionY(c)    ) == ter_wall_immutable);
+  num_immutable += (mapxy(getCharPositionX(c)    ,
+                          getCharPositionY(c) - 1) == ter_wall_immutable);
+  num_immutable += (mapxy(getCharPositionX(c)    ,
+                          getCharPositionY(c) + 1) == ter_wall_immutable);
 
   return num_immutable > 1;
 }
@@ -174,8 +180,8 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
   pair_t next;
   uint32_t was_stairs = 0;
 
-  next[dim_y] = d->pc.position[dim_y];
-  next[dim_x] = d->pc.position[dim_x];
+  next[dim_y] = getCharPositionY(d->pc);
+  next[dim_x] = getCharPositionX(d->pc);
 
 
   switch (dir) {
@@ -210,13 +216,13 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
     next[dim_x]++;
     break;
   case '<':
-    if (mappair(d->pc.position) == ter_stairs_up) {
+    if (mapxy(getCharPositionX(d->pc), getCharPositionY(d->pc)) == ter_stairs_up) {
       was_stairs = 1;
       new_dungeon_level(d, '<');
     }
     break;
   case '>':
-    if (mappair(d->pc.position) == ter_stairs_down) {
+    if (mapxy(getCharPositionX(d->pc), getCharPositionY(d->pc)) == ter_stairs_down) {
       was_stairs = 1;
       new_dungeon_level(d, '>');
     }

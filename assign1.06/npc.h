@@ -67,7 +67,7 @@ class npc_t : public character_t {
 
 };
 #else
-typedef void npc_t
+typedef void npc_t;
 #endif
 
 #ifdef __cplusplus

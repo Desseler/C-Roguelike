@@ -1,13 +1,12 @@
 #ifndef PC_H
 # define PC_H
 
-class pc_t;
-
 # include <stdint.h>
 
 # include "dims.h"
 # include "character.h"
 # include "dungeon.h"
+# include "io.h"
 
 typedef struct dungeon dungeon_t;
 
@@ -15,8 +14,8 @@ typedef struct dungeon dungeon_t;
 
 class pc_t : public character_t {
  public:
-  terrain_type_t map[DUNGEON_Y][DUNGEON_X];  
- 
+
+  pc_t();
 };
 #else
 typedef void pc_t;

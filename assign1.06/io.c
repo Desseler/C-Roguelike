@@ -114,14 +114,14 @@ static void io_print_message_queue(uint32_t y, uint32_t x)
 
 void io_calculate_offset(dungeon_t *d)
 {
-  d->io_offset[dim_x] = ((d->pc.position[dim_x] - 10) / 20) * 20;
+  d->io_offset[dim_x] = ((getCharPositionX(d->pc) - 10) / 20) * 20;
   if (d->io_offset[dim_x] < 0) {
     d->io_offset[dim_x] = 0;
   }
   if (d->io_offset[dim_x] > 80) {
     d->io_offset[dim_x] = 80;
   }
-  d->io_offset[dim_y] = ((d->pc.position[dim_y] - 4) / 7) * 7;
+  d->io_offset[dim_y] = ((getCharPositionY(d->pc) - 4) / 7) * 7;
   if (d->io_offset[dim_y] < 0) {
     d->io_offset[dim_y] = 0;
   }
@@ -134,8 +134,8 @@ void io_update_offset(dungeon_t *d)
 {
   int32_t x, y;
 
-  x = (40 + d->io_offset[dim_x]) - d->pc.position[dim_x];
-  y = (11 + d->io_offset[dim_y]) - d->pc.position[dim_y];
+  x = (40 + d->io_offset[dim_x]) - getCharPositionX(d->pc);
+  y = (11 + d->io_offset[dim_y]) - getCharPositionY(d->pc);
 
   if (x >= 15 && d->io_offset[dim_x]) {
     d->io_offset[dim_x] -= 20;
@@ -207,8 +207,8 @@ void io_display(dungeon_t *d)
     for (x = 0; x < 80; x++) {
       if (d->character[d->io_offset[dim_y] + y]
                       [d->io_offset[dim_x] + x]) {
-        mvaddch(y + 1, x, d->character[d->io_offset[dim_y] + y]
-                                      [d->io_offset[dim_x] + x]->symbol);
+        mvaddch(y + 1, x, getCharSymbol(d->character[d->io_offset[dim_y] + y]
+				                 	[d->io_offset[dim_x] + x]));
       } else {
         switch (pcmapxy(d->io_offset[dim_x] + x,
                       d->io_offset[dim_y] + y)) {
@@ -242,7 +242,7 @@ void io_display(dungeon_t *d)
   }
 
   mvprintw(23, 0, "PC position is (%3d,%2d); offset is (%3d,%2d).",
-           d->pc.position[dim_x], d->pc.position[dim_y],
+           getCharPositionX(d->pc), getCharPositionY(d->pc),
            d->io_offset[dim_x], d->io_offset[dim_y]);
 
   io_print_message_queue(0, 0);
@@ -360,11 +360,11 @@ uint32_t io_teleport_pc(dungeon_t *d)
     dest[dim_y] = rand_range(1, DUNGEON_Y - 2);
   } while (charpair(dest));
 
-  d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = NULL;
+  d->character[getCharPositionY(d->pc)][getCharPositionX(d->pc)] = NULL;
   d->character[dest[dim_y]][dest[dim_x]] = &d->pc;
 
-  d->pc.position[dim_y] = dest[dim_y];
-  d->pc.position[dim_x] = dest[dim_x];
+  setCharPositionY(d->pc, dest[dim_y]);
+  setCharPositionX(d->pc, dest[dim_x]);
 
   if (mappair(dest) < ter_floor) {
     mappair(dest) = ter_floor;
@@ -456,15 +456,15 @@ static void io_list_monsters_display(dungeon_t *d,
 
   for (i = 0; i < count; i++) {
     snprintf(s[i], 40, "%16s%c: %2d %s by %2d %s",
-             (c[i]->symbol == 'd' ? "A tenacious " :
+             (getCharSymbol(c[i]) == 'd' ? "A tenacious " :
               adjectives[rand() % (sizeof (adjectives) /
                                    sizeof (adjectives[0]))]),
-             c[i]->symbol,
-             abs(c[i]->position[dim_y] - d->pc.position[dim_y]),
-             ((c[i]->position[dim_y] - d->pc.position[dim_y]) <= 0 ?
+             getCharSymbol(c[i]),
+             abs(getCharPositionY(c[i]) - getCharPositionY(d->pc)),
+             ((getCharPositionY(c[i]) - getCharPositionY(d->pc)) <= 0 ?
               "North" : "South"),
-             abs(c[i]->position[dim_x] - d->pc.position[dim_x]),
-             ((c[i]->position[dim_x] - d->pc.position[dim_x]) <= 0 ?
+             abs(getCharPositionX(c[i]) - getCharPositionX(d->pc)),
+	     ((getCharPositionX(c[i]) - getCharPositionX(d->pc)) <= 0 ?
               "East" : "West"));
     if (count <= 13) {
       /* Handle the non-scrolling case right here. *
@@ -493,8 +493,8 @@ static int compare_monster_distance(const void *v1, const void *v2)
   const character_t *const *c1 = v1;
   const character_t *const *c2 = v2;
 
-  return (dungeon->pc_distance[(*c1)->position[dim_y]][(*c1)->position[dim_x]] -
-          dungeon->pc_distance[(*c2)->position[dim_y]][(*c2)->position[dim_x]]);
+  return (dungeon->pc_distance[getCharPositionY((character_t*) (*c1))][getCharPositionX((character_t*) (*c1))] -
+          dungeon->pc_distance[getCharPositionY((character_t*) (*c2))][getCharPositionX((character_t*) (*c2))]);
 }
 
 static void io_list_monsters(dungeon_t *d)

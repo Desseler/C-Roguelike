@@ -8,6 +8,7 @@
 #include "npc.h"
 #include "move.h"
 #include "io.h"
+#include "character.h"
 
 const char *victory =
   "                                       o\n"
@@ -177,10 +178,12 @@ int main(int argc, char *argv[])
             usage(argv[0]);
           }
           do_place_pc = 1;
-          if ((d.pc.position[dim_y] = atoi(argv[++i])) < 1 ||
-              d.pc.position[dim_y] > DUNGEON_Y - 2         ||
-              (d.pc.position[dim_x] = atoi(argv[++i])) < 1 ||
-              d.pc.position[dim_x] > DUNGEON_X - 2) {
+	  setCharPositionY(d.pc, atoi(argv[++i]));
+	  setCharPositionX(d.pc, atoi(argv[++i]));
+          if ((getCharPositionY(d.pc))                  < 1  ||
+              getCharPositionY(d.pc) > DUNGEON_Y - 2         ||
+              (getCharPositionX(d.pc))                  < 1  ||
+              getCharPositionX(d.pc) > DUNGEON_X - 2) {
             fprintf(stderr, "Invalid PC position.\n");
             usage(argv[0]);
           }
@@ -236,10 +239,10 @@ int main(int argc, char *argv[])
     write_dungeon(&d, save_file);
   }
 
-  printf(pc_is_alive(&d) ? victory : tombstone);
+  //printf(pc_is_alive(&d) ? victory : tombstone);
   printf("\nYou defended your life in the face of %u deadly beasts.\n"
          "You avenged the cruel and untimely murders of %u peaceful dungeon residents.\n",
-         d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
+         getCharKills(d.pc, kill_direct), getCharKills(d.pc, kill_avenged));
 
   pc_delete(d.pc);
 

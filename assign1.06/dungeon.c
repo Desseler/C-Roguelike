@@ -1074,7 +1074,7 @@ void new_dungeon(dungeon_t *d)
   d->character_sequence_number = sequence_number;
 
   place_pc(d);
-  d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = &d->pc;
+  d->character[getCharPositionY(d->pc)][getCharPositionX(d->pc)] = &d->pc;
   io_calculate_offset(d);
 
   gen_monsters(d);

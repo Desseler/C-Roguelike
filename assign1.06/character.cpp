@@ -24,6 +24,10 @@ character_t::character_t(char sym, pair_t pos, int32_t spd, uint32_t seq)
   sequence_number = seq;
 }
 
+character_t::~character_t()
+{
+}
+
 uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)
 {
   /* Application of Bresenham's Line Drawing Algorithm.  If we can draw *
@@ -165,6 +169,11 @@ void character_t::increaseKill(kill_type_t num)
   kills[num]++;
 }
 
+void character_t::setKill(kill_type_t num, uint32_t amount)
+{
+  kills[num] = amount;
+}
+
 void character_delete(character_t *c)
 {
   if (c) {
@@ -222,14 +231,19 @@ void killChar(character_t *ch)
   ch->kill();
 }
 
-void increaseCharKill(character_t *ch, kill_type_t num)
+void increaseCharKills(character_t *ch, kill_type_t num)
 {
   ch->increaseKill(num);
 }
 
+void setCharKills(character_t *ch, kill_type_t num, uint32_t amount)
+{
+  ch->setKill(num, amount);
+}
 
-
+/*
 int main()
 {
   return 0;
 }
+*/

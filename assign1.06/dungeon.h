@@ -5,7 +5,6 @@
 # include "macros.h"
 # include "dims.h"
 # include "character.h"
-# include "pc.h"
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              105
@@ -25,11 +24,12 @@
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
 #define mapxy(x, y) (d->map[y][x])
-#define pcmapxy(x, y) (d->pc->map[y][x])
+#define pcmapxy(x, y) (d->pcmap[y][x])
 #define hardnesspair(pair) (d->hardness[pair[dim_y]][pair[dim_x]])
 #define hardnessxy(x, y) (d->hardness[y][x])
 #define charpair(pair) (d->character[pair[dim_y]][pair[dim_x]])
 #define charxy(x, y) (d->character[y][x])
+
 
 typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_debug,
@@ -43,17 +43,23 @@ typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_stairs_down
 } terrain_type_t;
 
+
 typedef struct room {
   pair_t position;
   pair_t size;
 } room_t;
 
-//typedef struct character character_t;
+#ifndef __cplusplus
+typedef void pc_t;
+#else
+class pc_t;
+#endif
 
 typedef struct dungeon {
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
+  terrain_type_t pcmap[DUNGEON_Y][DUNGEON_X];
   /* Since hardness is usually not used, it would be expensive to pull it *
    * into cache every time we need a map cell, so we store it in a        *
    * parallel array, rather than using a structure to represent the       *

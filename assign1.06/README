@@ -5,5 +5,7 @@ Uses Jeremy's solution code from assignment 1.05
 Edited character, NPC, and PC into C++ code implementing them as classes.
 NPC and PC both inherit character class.
 
+**Fog of War implementation is in move.c line 110**
+
 Compile with command:
 make rlg327

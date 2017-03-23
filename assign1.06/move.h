@@ -4,6 +4,8 @@
 # include <stdint.h>
 
 # include "dims.h"
+# include "character.h"
+# include "npc.h"
 
 typedef struct dungeon dungeon_t;
 //typedef struct character character_t;

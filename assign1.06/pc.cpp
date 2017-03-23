@@ -10,6 +10,14 @@
 #include "path.h"
 #include "io.h"
 
+pc_t::pc_t()
+{
+  symbol = '@';
+  speed = PC_SPEED;
+  alive = 1;
+  sequence_number = 0;
+}
+
 uint32_t pc_is_alive(dungeon_t *d)
 {
   return d->pc->alive;
@@ -39,7 +47,7 @@ void config_pc(dungeon_t *d)
   //d->pc->npc = NULL;
   //d->pc->kills[kill_direct] = d->pc->kills[kill_avenged] = 0;
 
-  d->character[d->pc->position[dim_y]][d->pc->position[dim_x]] = &d->pc;
+  d->character[d->pc->position[dim_y]][d->pc->position[dim_x]] = d->pc;
 
   dijkstra(d);
   dijkstra_tunnel(d);
@@ -61,7 +69,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     have_seen_corner = 1;
   }
 
-  /* First, eat anybody standing next to us. *
+  * First, eat anybody standing next to us. *
   if (charxy(d->pc->position[dim_x] - 1, d->pc->position[dim_y] - 1)) {
     dir[dim_y] = -1;
     dir[dim_x] = -1;
@@ -83,7 +91,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     dir[dim_y] = 1;
     dir[dim_x] = 1;
   } else if (!have_seen_corner || count < 250) {
-    /* Head to a corner and let most of the NPCs kill each other off *
+    * Head to a corner and let most of the NPCs kill each other off *
     if (count) {
       count++;
     }
@@ -94,7 +102,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
       dir_nearest_wall(d, &d->pc, dir);
     }
   }else {
-    /* And after we've been there, let's head toward the center of the map. *
+    * And after we've been there, let's head toward the center of the map. *
     if (!against_wall(d, &d->pc) && ((rand() & 0x111) == 0x111)) {
       dir[dim_x] = (rand() % 3) - 1;
       dir[dim_y] = (rand() % 3) - 1;
@@ -104,7 +112,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
     }
   }
 
-  /* Don't move to an unoccupied location if that places us next to a monster *
+  * Don't move to an unoccupied location if that places us next to a monster *
   if (!charxy(d->pc->position[dim_x] + dir[dim_x],
               d->pc->position[dim_y] + dir[dim_y]) &&
       ((charxy(d->pc->position[dim_x] + dir[dim_x] - 1,
@@ -162,10 +170,9 @@ uint32_t pc_in_room(dungeon_t *d, uint32_t room)
   return 0;
 }
 
-pc_t * pc_create();
+pc_t * pc_create()
 {
-  pair_t p;
-  return new pc_t('@', p, PC_SPEED, 0)
+  return new pc_t();
 }
 
 void pc_delete(pc_t *pc)
@@ -175,7 +182,9 @@ void pc_delete(pc_t *pc)
   }
 }
 
+/*
 int main()
 {
   return 0;
 }
+*/

@@ -135,7 +135,7 @@ void gen_monsters(dungeon_t *d)
                              d->rooms[room].size[dim_x] - 1));
     } while (d->character[p[dim_y]][p[dim_x]]);
     char sym = rand() & 0x0000000f;
-    npc_t *m = new npc_t(sym, p, rand_range(5, 20), ++d->character_sequence_number, symbol[sym]);
+    npc_t *m = new npc_t(sym, p, rand_range(5, 20), ++d->character_sequence_number, symbol[(int8_t)sym]);
     //m->position[dim_y] = p[dim_y];
     //m->position[dim_x] = p[dim_x];
     //d->character[p[dim_y]][p[dim_x]] = m;
@@ -622,8 +622,9 @@ uint32_t dungeon_has_npcs(dungeon_t *d)
   return d->num_monsters;
 }
 
-
+/*
 int main()
 {
   return 0;
 }
+*/

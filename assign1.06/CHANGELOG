@@ -14,3 +14,6 @@
 -Finished character, npc, and pc classes
 -Added accessors and mutators for created classes to be used by C code
 -Added extern C for name mangling
+-Finished implementing C++ accessors and mutators in C code.
+-Added Fog of War
+-Everything compiles, but it doesn't link properly	

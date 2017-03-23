@@ -48,6 +48,7 @@ class character_t {
   void setPositionY(int16_t pos);
   void kill();
   void increaseKill(kill_type_t num);
+  void setKill(kill_type_t num, uint32_t amount);
 
   ~character_t();
 };
@@ -73,10 +74,12 @@ uint32_t getCharAlive(character_t *ch);
 uint32_t getCharSequenceNumber(character_t *ch);
 uint32_t getCharKills(character_t *ch, kill_type_t num);
 
-void setCharPositionY(character_t *ch, int16_t pos);
+void setCharPositionX(character_t *ch, int16_t pos);
 void setCharPositionY(character_t *ch, int16_t pos);
 void killChar(character_t *ch);
-void increaseCharKill(character_t *ch, kill_type_t num);
+void increaseCharKills(character_t *ch, kill_type_t num);
+void setCharKills(character_t *ch, kill_type_t num, uint32_t amount);
+  
 
 #ifdef __cplusplus
 }
