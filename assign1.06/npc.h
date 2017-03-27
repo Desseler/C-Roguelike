@@ -76,7 +76,7 @@ extern "C" {
 
 void gen_monsters(dungeon_t *d);
 void npc_delete(npc_t *n);
-void npc_next_pos(dungeon_t *d, character_t *c, pair_t next);
+void npc_next_pos(dungeon_t *d, npc_t *c, pair_t next);
 uint32_t dungeon_has_npcs(dungeon_t *d);
 
 npc_characteristics_t getNpcCharacteristics(npc_t *ch);
