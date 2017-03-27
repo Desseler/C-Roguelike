@@ -56,7 +56,7 @@ void io_queue_message(const char *format, ...)
   io_message_t *tmp;
   va_list ap;
 
-  if (!(tmp = malloc(sizeof (*tmp)))) {
+  if (!(tmp = (io_message_t*) malloc(sizeof (*tmp)))) {
     perror("malloc");
     exit(1);
   }
@@ -464,7 +464,7 @@ static void io_list_monsters_display(dungeon_t *d,
   uint32_t i;
   char (*s)[40]; /* pointer to array of 40 char */
 
-  s = malloc(count * sizeof (*s));
+  s = (char (*)[40]) malloc(count * sizeof (*s));
 
   mvprintw(3, 19, " %-40s ", "");
   /* Borrow the first element of our array for this string: */
@@ -508,8 +508,8 @@ static void io_list_monsters_display(dungeon_t *d,
 
 static int compare_monster_distance(const void *v1, const void *v2)
 {
-  const character *const *c1 = v1;
-  const character *const *c2 = v2;
+  const character *const *c1 = (const character* const*) v1;
+  const character *const *c2 = (const character* const*) v2;
 
   return (dungeon->pc_distance[character_get_y(*c1)][character_get_x(*c1)] -
           dungeon->pc_distance[character_get_y(*c2)][character_get_x(*c2)]);
@@ -520,7 +520,7 @@ static void io_list_monsters(dungeon_t *d)
   character **c;
   uint32_t x, y, count;
 
-  c = malloc(d->num_monsters * sizeof (*c));
+  c = (character**) malloc(d->num_monsters * sizeof (*c));
 
   /* Get a linear list of monsters */
   for (count = 0, y = 1; y < DUNGEON_Y - 1; y++) {

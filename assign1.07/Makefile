@@ -9,7 +9,7 @@ LDFLAGS = -lncurses
 
 BIN = rlg327
 OBJS = rlg327.o heap.o dungeon.o path.o utils.o character.o event.o \
-       pc.o npc.o move.o io.o
+       pc.o npc.o move.o io.o parser.o
 
 all: $(BIN) etags
 

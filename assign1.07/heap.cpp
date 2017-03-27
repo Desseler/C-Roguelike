@@ -126,7 +126,7 @@ heap_node_t *heap_insert(heap_t *h, void *v)
 {
   heap_node_t *n;
 
-  n = calloc(1, sizeof (*n));
+  n = (heap_node_t*) calloc(1, sizeof (*n));
   n->datum = v;
 
   if (h->min) {

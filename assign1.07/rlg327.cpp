@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   dungeon_t d;
   time_t seed;
   struct timeval tv;
-  uint32_t i;
+  int i;
   uint32_t do_load, do_save, do_seed, do_image, do_place_pc;
   uint32_t long_arg;
   char *save_file;
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
    * interesting test dungeons for you.                             */
  
  if (argc > 1) {
-    for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
+   for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
       if (argv[i][0] == '-') { /* All switches start with a dash */
         if (argv[i][1] == '-') {
           argv[i]++;    /* Make the argument have a single dash so we can */
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     write_dungeon(&d, save_file);
   }
 
-  printf(pc_is_alive(&d) ? victory : tombstone);
+  //printf(pc_is_alive(&d) ? victory : tombstone);
   printf("\nYou defended your life in the face of %u deadly beast%s.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon resident%s.\n",

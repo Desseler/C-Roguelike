@@ -48,8 +48,8 @@ void move_character(dungeon_t *d, character *c, pair_t next)
   }
 
   if (c == d->PC) {
-    pc_reset_visibility(c);
-    pc_observe_terrain(c, d);
+    pc_reset_visibility((pc*) c);
+    pc_observe_terrain((pc*) c, d);
   }
 }
 
@@ -67,7 +67,7 @@ void do_moves(dungeon_t *d)
     /* The PC always goes first one a tie, so we don't use new_event().  *
      * We generate one manually so that we can set the PC sequence       *
      * number to zero.                                                   */
-    e = malloc(sizeof (*e));
+    e = (event_t*) malloc(sizeof (*e));
     e->type = event_character_turn;
     /* The next line is buggy.  Monsters get first turn before PC.  *
      * Monster gen code always leaves PC in a monster-free room, so *
@@ -79,7 +79,7 @@ void do_moves(dungeon_t *d)
   }
 
   while (pc_is_alive(d) &&
-         (e = heap_remove_min(&d->events)) &&
+         (e = (event_t*) heap_remove_min(&d->events)) &&
          ((e->type != event_character_turn) || (e->c != d->PC))) {
     d->time = e->time;
     if (e->type == event_character_turn) {
@@ -95,7 +95,7 @@ void do_moves(dungeon_t *d)
       continue;
     }
 
-    npc_next_pos(d, c, next);
+    npc_next_pos(d, (npc*) c, next);
     move_character(d, c, next);
 
     heap_insert(&d->events, update_event(d, e, 1000 / character_get_speed(c)));
