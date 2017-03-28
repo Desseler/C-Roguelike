@@ -3,10 +3,10 @@
 
 # include <stdint.h>
 # include <iostream>
-# include <fstream>
+# include <ifstream>
 
 class parser {
-  ofstream file;
+  ifstream f;
  public:
   void open_file(string filename);
   
