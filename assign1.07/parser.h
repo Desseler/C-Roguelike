@@ -1,15 +1,11 @@
 #ifndef PARSER_H
 # define PARSER_H
 
-# include <iostream>
-# include <ifstream>
-# include <string>
+# include <stdint.h>
 
 class parser {
- private:
-  ifstream f;
  public:
-  void parse_monster_file(string filename);
-}
+  void parse_monster_file();
+};
 
 #endif

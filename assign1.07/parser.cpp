@@ -1,27 +1,32 @@
 #include <iostream>
-#include <ifstream>
+#include <fstream>
 #include <string>
+#include <unistd.h>
+#include <cstdlib>
 
 #include "parser.h"
 
 using namespace std;
 
-void parser::parse_monster_file(string filename);
+void parser::parse_monster_file()
 {
-  f.open(filename);
+  chdir(getenv("HOME"));
+  chdir("./.rlg327");
+  
+  ifstream f("monster_desc.txt", ios::in);
 
   string buffer;
   getline(f, buffer);
   if (buffer != "RLG327 MONSTER DESCRIPTION 1") {
     cerr << "Incorrect File Version";
 
-    return EXIT_FAILURE;
+    exit(0);
   }
   
   string NAME, DESC, COLOR, SPEED, ABIL, HP, DAM, SYMB;
-  getline(f, buffer);
+  //getline(f, buffer);
   
-  while (!f.eof) {
+  while (getline(f, buffer)) {
     NAME = DESC = COLOR = SPEED = ABIL = HP = DAM = SYMB = "";
 
     getline(f, buffer);
@@ -33,7 +38,7 @@ void parser::parse_monster_file(string filename);
 	  getline(f, NAME, '\n');
 	  
 	} else if (buffer == "DESC") {
-	  getline(f, buffer '\n');
+	  getline(f, buffer, '\n');
 	  getline(f, buffer);
 	  while (buffer != ".") {
 	    DESC += buffer + "\n";
@@ -70,7 +75,7 @@ void parser::parse_monster_file(string filename);
       cout << HP;
       cout << DAM;
 
-      getline(f, buffer);
+      //getline(f, buffer);
     }
   }
 }

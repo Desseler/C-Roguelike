@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 {
   parser p = new parser;
 
-  p.parse_monster_file("monster_desc.txt");
+  p.parse_monster_file();
 
 
   
