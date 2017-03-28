@@ -8,6 +8,7 @@
 #include "npc.h"
 #include "move.h"
 #include "io.h"
+#include "parser.h"
 
 const char *victory =
   "                                       o\n"
@@ -74,6 +75,14 @@ void usage(char *name)
 
 int main(int argc, char *argv[])
 {
+  parser p = new parser;
+
+  p.parse_monster_file("monster_desc.txt");
+
+
+  
+  /* Assignment 1.07 main method put in place of regular main method *
+
   dungeon_t d;
   time_t seed;
   struct timeval tv;
@@ -86,14 +95,14 @@ int main(int argc, char *argv[])
 
   memset(&d, 0, sizeof (d));
 
-  /* Default behavior: Seed with the time, generate a new dungeon, *
-   * and don't write to disk.                                      */
+   * Default behavior: Seed with the time, generate a new dungeon, *
+   * and don't write to disk.                                      *
   do_load = do_save = do_image = do_place_pc = 0;
   do_seed = 1;
   save_file = load_file = NULL;
   d.max_monsters = MAX_MONSTERS;
 
-  /* The project spec requires '--load' and '--save'.  It's common  *
+   * The project spec requires '--load' and '--save'.  It's common  *
    * to have short and long forms of most switches (assuming you    *
    * don't run out of letters).  For now, we've got plenty.  Long   *
    * forms use whole words and take two dashes.  Short forms use an *
@@ -105,21 +114,21 @@ int main(int argc, char *argv[])
    * files.  No means to save to non-default locations, however.    *
    * And the final switch, '--image', allows me to create a dungeon *
    * from a PGM image, so that I was able to create those more      *
-   * interesting test dungeons for you.                             */
+   * interesting test dungeons for you.                             *
  
  if (argc > 1) {
    for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
-      if (argv[i][0] == '-') { /* All switches start with a dash */
+      if (argv[i][0] == '-') {  * All switches start with a dash *
         if (argv[i][1] == '-') {
-          argv[i]++;    /* Make the argument have a single dash so we can */
-          long_arg = 1; /* handle long and short args at the same place.  */
+          argv[i]++;     * Make the argument have a single dash so we can *
+          long_arg = 1;  * handle long and short args at the same place.  *
         }
         switch (argv[i][1]) {
         case 'r':
           if ((!long_arg && argv[i][2]) ||
               (long_arg && strcmp(argv[i], "-rand")) ||
-              argc < ++i + 1 /* No more arguments */ ||
-              !sscanf(argv[i], "%lu", &seed) /* Argument is not an integer */) {
+              argc < ++i + 1  * No more arguments *  ||
+              !sscanf(argv[i], "%lu", &seed)  * Argument is not an integer *) {
             usage(argv[0]);
           }
           do_seed = 0;
@@ -131,8 +140,8 @@ int main(int argc, char *argv[])
           }
           do_load = 1;
           if ((argc > i + 1) && argv[i + 1][0] != '-') {
-            /* There is another argument, and it's not a switch, so *
-             * we'll treat it as a save file and try to load it.    */
+             * There is another argument, and it's not a switch, so *
+             * we'll treat it as a save file and try to load it.    *
             load_file = argv[++i];
           }
           break;
@@ -143,8 +152,8 @@ int main(int argc, char *argv[])
           }
           do_save = 1;
           if ((argc > i + 1) && argv[i + 1][0] != '-') {
-            /* There is another argument, and it's not a switch, so *
-             * we'll treat it as a save file and try to load it.    */
+             * There is another argument, and it's not a switch, so *
+             * we'll treat it as a save file and try to load it.    *
             save_file = argv[++i];
           }
           break;
@@ -155,20 +164,20 @@ int main(int argc, char *argv[])
           }
           do_image = 1;
           if ((argc > i + 1) && argv[i + 1][0] != '-') {
-            /* There is another argument, and it's not a switch, so *
-             * we'll treat it as a save file and try to load it.    */
+             * There is another argument, and it's not a switch, so *
+             * we'll treat it as a save file and try to load it.    *
             pgm_file = argv[++i];
           }
           break;
         case 'n':
           if ((!long_arg && argv[i][2]) ||
               (long_arg && strcmp(argv[i], "-nummon")) ||
-              argc < ++i + 1 /* No more arguments */ ||
+              argc < ++i + 1  * No more arguments * ||
               !sscanf(argv[i], "%hu", &d.max_monsters)) {
             usage(argv[0]);
           }
           break;
-          /*
+          *
         case 'p':
           if ((!long_arg && argv[i][2])            ||
               (long_arg && strcmp(argv[i], "-pc")) ||
@@ -186,19 +195,19 @@ int main(int argc, char *argv[])
             usage(argv[0]);
           }
           break;
-          */
+          *
         default:
           usage(argv[0]);
         }
-      } else { /* No dash */
+      } else { * No dash *
         usage(argv[0]);
       }
     }
   }
 
   if (do_seed) {
-    /* Allows me to generate more than one dungeon *
-     * per second, as opposed to time().           */
+     * Allows me to generate more than one dungeon *
+     * per second, as opposed to time().           *
     gettimeofday(&tv, NULL);
     seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
   }
@@ -246,13 +255,15 @@ int main(int argc, char *argv[])
          character_get_ikills(d.PC) == 1 ? "" : "s");
 
   if (pc_is_alive(&d)) {
-    /* If the PC is dead, it's in the move heap and will get automatically *
+     * If the PC is dead, it's in the move heap and will get automatically *
      * deleted when the heap destructs.  In that case, we can't call       *
-     * delete_pc(), because it will lead to a double delete.               */
+     * delete_pc(), because it will lead to a double delete.               *
     character_delete(d.PC);
   }
 
-  delete_dungeon(&d);
+  delete_dungeon(&d); */
+
+  
 
   return 0;
 }
