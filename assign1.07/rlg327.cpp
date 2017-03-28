@@ -75,13 +75,13 @@ void usage(char *name)
 
 int main(int argc, char *argv[])
 {
-  parser p = new parser;
+  parser *p = new parser;
 
-  p.parse_monster_file();
-
-
+  p->parse_monster_file();
   
   /* Assignment 1.07 main method put in place of regular main method *
+
+
 
   dungeon_t d;
   time_t seed;

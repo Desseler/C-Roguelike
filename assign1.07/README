@@ -1,1 +1,27 @@
-Assignment 1.07 for Com Sci 327
+Assignment 1.07 for Com Sci 327 by Trevor Luster
+2017-03-28
+
+Source code: parser.cpp, parser.h
+
+Implements parsing of a monster description .txt file and outputs to console.
+It uses ifstream and string in C++. The program no longer has normal functionality
+of generating a dungeon and starting the game. According to the assignment
+specification, it has been changed to parse the text file located at:
+
+$HOME/.rlg327/monster_desc.txt
+
+
+and output the parsed data to console. The program takes no arguments and can be
+compiled with the following command:
+
+make rlg327
+
+
+Run with:
+
+./rlg327
+
+
+Clean with:
+
+make clean

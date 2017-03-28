@@ -4,5 +4,10 @@
 
 #[2017-03-27]
 -Renamed files from *.c to *.cpp
+-Fixed compile errors
 
-
+#[2017-03-28]
+-Added parser.h and parser.cpp
+-Implemented parser
+-Changed main method to no longer generate dungeon nor initialize game
+-Main method parses ~/.rlg327/monster_desc.txt and outputs to console
