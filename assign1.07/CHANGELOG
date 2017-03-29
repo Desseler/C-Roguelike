@@ -11,3 +11,8 @@
 -Implemented parser
 -Changed main method to no longer generate dungeon nor initialize game
 -Main method parses ~/.rlg327/monster_desc.txt and outputs to console
+
+#[2017-03-29]
+-Added check in parser for incomplete monster descriptions to not print incomplete descriptions
+
+
