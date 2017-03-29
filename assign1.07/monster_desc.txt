@@ -36,6 +36,14 @@ SPEED 10+10d2
 END
 
 BEGIN MONSTER
+NAME Incomplete Monster
+DESC
+This monster is meant to crash a parser that does not check for incomplete
+monsters. Stay safe.
+.
+END
+
+BEGIN MONSTER
 NAME Durin's Bane
 DESC
 Nameless Terror, Flame of Udun, Shadow and Flame
