@@ -85,7 +85,7 @@ class object_description {
            const dice &defence,
            const dice &weight,
            const dice &speed,
-           const dice &attrubute,
+           const dice &attribute,
            const dice &value);
   std::ostream &print(std::ostream &o);
   /* Need all these accessors because otherwise there is a *
