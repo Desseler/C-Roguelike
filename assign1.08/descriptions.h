@@ -60,6 +60,9 @@ class monster_description {
            const dice &damage);
   std::ostream &print(std::ostream &o);
   char get_symbol() { return symbol; }
+
+  static npc *create_npc(std::string name, std::string description, npc_characteristics_t characteristics,
+			  dice damage, dice speed, dice hp, uint32_t color, char symbol);
 };
 
 class object_description {
@@ -102,6 +105,10 @@ class object_description {
   inline const dice &get_speed() const { return speed; }
   inline const dice &get_attribute() const { return attribute; }
   inline const dice &get_value() const { return value; }
+
+  static item *create_item(std::string name, std::string description, object_type_t type,
+			   dice hit, dice damage, dice dodge, dice defence, dice weight,
+			   dice speed, dice attribute, dice value);
 };
 
 std::ostream &operator<<(std::ostream &o, monster_description &m);

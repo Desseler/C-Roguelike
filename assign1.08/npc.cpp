@@ -9,6 +9,20 @@
 #include "event.h"
 #include "pc.h"
 
+npc::npc(std::string name, std::string description, npc_characteristics_t characteristics,
+         dice damage, dice speed, dice hp, uint32_t color, char symbol)
+{
+  name = name;
+  description = description;
+  characteristics = characteristics;
+  damage = damage;
+  speed = speed.roll();
+  hp = hp.roll();
+  color = color;
+  symbol = symbol;
+}
+
+
 void npc_delete(npc *n)
 {
   if (n) {

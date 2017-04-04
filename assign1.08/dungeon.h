@@ -6,6 +6,7 @@
 # include "dims.h"
 # include "character.h"
 # include "descriptions.h"
+# include "item.h"
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              105
@@ -32,6 +33,9 @@
 #define hardnessxy(x, y) (d->hardness[y][x])
 #define charpair(pair) (d->character_map[pair[dim_y]][pair[dim_x]])
 #define charxy(x, y) (d->character_map[y][x])
+#define itempair(pair) (d->item_map[pair[dim_y]][pair[dim_x]])
+#define itemxy(x, y) (d->item_map[y][x])
+
 
 typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_debug,
@@ -69,6 +73,7 @@ typedef struct dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   character *character_map[DUNGEON_Y][DUNGEON_X];
+  item *item_map[DUNGEON_Y][DUNGEON_X];
   pc *PC;
   heap_t events;
   uint16_t num_monsters;

@@ -13,6 +13,9 @@ class npc : public character {
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
+
+  npc(std::string name, std::string description, npc_characteristics_t characteristics,
+      dice damage, dice speed, dice hp, uint32_t color, char symbol);
 };
 
 # define NPC_SMART         0x00000001

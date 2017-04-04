@@ -1,8 +1,8 @@
 #[2017-03-30]
 -Created Project. Imported Jeremy's 1.07 Solution code
 
-
-
+#[2017-04-03]
+-Added item class. Made object_description and monster_description class factories
 
 
 
