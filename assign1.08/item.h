@@ -1,6 +1,8 @@
 #ifndef ITEM_H
 # define ITEM_H
 
+
+
 # include <stdint.h>
 # include <vector>
 # include <string>
@@ -21,5 +23,7 @@ class item {
                   dice speed, dice attribute, dice value, uint32_t color);
   char symbol();
 };
+
+void gen_items(dungeon_t *d);
 
 #endif

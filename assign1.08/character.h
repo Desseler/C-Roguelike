@@ -1,6 +1,7 @@
 #ifndef CHARACTER_H
 # define CHARACTER_H
 
+# undef swap
 # include <stdint.h>
 # include <string>
 # include "dims.h"
@@ -18,7 +19,7 @@ class character {
   pair_t position;
   int32_t speed, hp;
   dice damage;
-  str::string name, description;
+  std::string name, description;
   uint32_t alive, color;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
    * an event queue, there's no need for that here.  Instead it's in the    *

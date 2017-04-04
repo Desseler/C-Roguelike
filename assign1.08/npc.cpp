@@ -9,15 +9,15 @@
 #include "event.h"
 #include "pc.h"
 
-npc::npc(std::string name, std::string description, npc_characteristics_t characteristics,
-         dice damage, dice speed, dice hp, uint32_t color, char symbol)
+npc::npc(std::string name, std::string description, uint32_t abilities,
+         dice damage, dice speed, dice hp, std::vector<uint32_t> color, char symbol)
 {
   name = name;
   description = description;
-  characteristics = characteristics;
+  characteristics = (npc_characteristics_t) abilities;
   damage = damage;
-  speed = speed.roll();
-  hp = hp.roll();
+  this->speed = speed.roll();
+  this->hp = hp.roll();
   color = color;
   symbol = symbol;
 }
@@ -50,8 +50,9 @@ void gen_monsters(dungeon_t *d)
   npc *m;
   uint32_t room;
   pair_t p;
-  const static char symbol[] = "0123456789abcdef";
+  //const static char symbol[] = "0123456789abcdef";
   uint32_t c;
+  monster_description mon;
 
   if (d->max_monsters < (c = max_monster_cells(d))) {
     d->num_monsters = d->max_monsters;
@@ -60,7 +61,8 @@ void gen_monsters(dungeon_t *d)
   }
 
   for (i = 0; i < d->num_monsters; i++) {
-    m = new npc;
+    mon = d->monster_descriptions[rand_range(0, d->monster_descriptions.size())];
+    m = mon.create_npc();
     memset(m, 0, sizeof (*m));
 
     do {
@@ -75,11 +77,11 @@ void gen_monsters(dungeon_t *d)
     m->position[dim_y] = p[dim_y];
     m->position[dim_x] = p[dim_x];
     d->character_map[p[dim_y]][p[dim_x]] = m;
-    m->speed = rand_range(5, 20);
+    //m->speed = rand_range(5, 20);
     m->alive = 1;
     m->sequence_number = ++d->character_sequence_number;
-    m->characteristics = rand() & 0x0000000f;
-    m->symbol = symbol[m->characteristics];
+    //m->characteristics = rand() & 0x0000000f;
+    //m->symbol = symbol[m->characteristics];
     m->have_seen_pc = 0;
     m->kills[kill_direct] = m->kills[kill_avenged] = 0;
 

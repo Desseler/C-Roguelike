@@ -2,6 +2,7 @@
 # define NPC_H
 
 # include <stdint.h>
+# include <vector>
 
 # include "dims.h"
 # include "character.h"
@@ -14,8 +15,8 @@ class npc : public character {
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
 
-  npc(std::string name, std::string description, npc_characteristics_t characteristics,
-      dice damage, dice speed, dice hp, uint32_t color, char symbol);
+  npc(std::string name, std::string description, uint32_t abilities,
+      dice damage, dice speed, dice hp, std::vector<uint32_t> color, char symbol);
 };
 
 # define NPC_SMART         0x00000001

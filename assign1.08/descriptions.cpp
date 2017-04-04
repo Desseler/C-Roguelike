@@ -969,15 +969,14 @@ std::ostream &operator<<(std::ostream &o, object_description &od)
   return od.print(o);
 }
 
-item *object_description::create_item(std::string name, std::string description, object_type_t type,
-				      dice hit, dice damage, dice dodge, dice defence, dice weight,
-				      dice speed, dice attribute, dice value)
+item *object_description::create_item()
 {
-  return new item(name, description, type, hit, damage, dodge, defence, weight, speed, attribute, value);
+  return new item(this->name, this->description, this->type, this->hit, this->damage, this->dodge,
+		  this->defence, this->weight, this->speed, this->attribute, this->value, this->color);
 }
 
-npc *object_description::create_npc(std::string name, std::string description, npc_characteristics_t characteristics,
-				    dice damage, dice speed, dice hp, uint32_t color, char symbol)
+npc *monster_description::create_npc()
 {
-  return new npc(name, description, characteristics, damage, speed, hp, color, symbol);
+  return new npc(this->name, this->description, this->abilities, this->damage, this->speed,
+		 this->hitpoints, this->color, this->symbol);
 }

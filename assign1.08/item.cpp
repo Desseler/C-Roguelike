@@ -7,26 +7,26 @@
 
 item::item()
 {
-  damage = new dice();
-  name = description = "";
+  //this->damage = new dice();
+  this->name = description = "";
 }
 
 item::item(std::string name, std::string description, object_type_t type,
 	   dice hit, dice damage, dice dodge, dice defence, dice weight,
 	   dice speed, dice attribute, dice value, uint32_t color)
 {
-  color = color;
-  hit = hit.roll();
-  dodge = dodge.roll();
-  defence = defence.roll();
-  weight = weight.roll();
-  speed = speed.roll();
-  attribute = attribute.roll();
-  value = value.roll();
-  damage = damage;
-  type = type;
-  name = name;
-  description = description;
+  this->color = color;
+  this->hit = hit.roll();
+  this->dodge = dodge.roll();
+  this->defence = defence.roll();
+  this->weight = weight.roll();
+  this->speed = speed.roll();
+  this->attribute = attribute.roll();
+  this->value = value.roll();
+  this->damage = damage;
+  this->type = type;
+  this->name = name;
+  this->description = description;
 }
 
 char item::symbol()
@@ -72,7 +72,11 @@ char item::symbol()
     return '-';
   case 19:
     return '%';
-  case:
+  default:
     return '*';
   }
+}
+
+void gen_items(dungeon_t *d)
+{
 }

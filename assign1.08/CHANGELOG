@@ -4,8 +4,8 @@
 #[2017-04-03]
 -Added item class. Made object_description and monster_description class factories
 
-
-
-
+#[2017-04-04]
+-Cleaned up compilation errors.
+-Modified gen_monsters to use descriptions
 
 

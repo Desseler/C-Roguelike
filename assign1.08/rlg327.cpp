@@ -8,7 +8,7 @@
 #include "npc.h"
 #include "move.h"
 #include "io.h"
-#include "descriptions.h"
+#include "character.h"
 
 const char *victory =
   "                                       o\n"
@@ -218,8 +218,11 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
   }
 
+  parse_descriptions(&d);
+  
   config_pc(&d);
   gen_monsters(&d);
+  //gen_items(&d);
 
   io_display(&d);
   while (pc_is_alive(&d) && dungeon_has_npcs(&d) && !d.quit) {
@@ -253,6 +256,7 @@ int main(int argc, char *argv[])
     character_delete(d.PC);
   }
 
+  destroy_descriptions(&d);
   delete_dungeon(&d);
 
   return 0;

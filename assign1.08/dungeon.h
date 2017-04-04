@@ -2,6 +2,7 @@
 # define DUNGEON_H
 
 # include "heap.h"
+# undef swap
 # include "macros.h"
 # include "dims.h"
 # include "character.h"
