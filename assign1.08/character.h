@@ -20,7 +20,7 @@ class character {
   pair_t position;
   int32_t speed, hp;
   dice damage;
-  std::string name, description;
+  //std::string name, description;
   uint32_t alive;
   uint32_t color;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
