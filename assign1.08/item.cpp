@@ -91,6 +91,7 @@ void gen_items(dungeon_t *d)
   for (i = 0; i < 50; i++) {
     obj = d->object_descriptions[rand_range(0, d->object_descriptions.size() - 1)];
     o = new item();
+    memset(o, 0, sizeof (*o));
     o = obj.create_item();
 
     do {

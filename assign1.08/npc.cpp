@@ -46,14 +46,11 @@ static uint32_t max_monster_cells(dungeon_t *d)
 }
 
 void gen_monsters(dungeon_t *d)
-{
-  printf("Starting gen_monsters\n\n");
-  
+{ 
   uint32_t i;
   npc *m;
   uint32_t room;
   pair_t p;
-  //const static char symbol[] = "0123456789abcdef";
   uint32_t c;
   monster_description mon;
 
@@ -63,13 +60,10 @@ void gen_monsters(dungeon_t *d)
     d->num_monsters = c;
   }
 
-  printf("Starting monster generation. Printing %i monsters.\n\n", d->num_monsters);
-
   for (i = 0; i < d->num_monsters; i++) {
-    printf("Generating monster #%i \n", i);
-    
     mon = d->monster_descriptions[rand_range(0, d->monster_descriptions.size() - 1)];
     m = new npc();
+    memset(m, 0, sizeof (*m));
     m = mon.create_npc();
 
     do {
@@ -85,8 +79,6 @@ void gen_monsters(dungeon_t *d)
     m->position[dim_x] = p[dim_x];
     m->sequence_number = ++d->character_sequence_number;
     d->character_map[p[dim_y]][p[dim_x]] = m;
-
-    printf("Monster characteristics: %i, Desc Abilities: %i \n", m->characteristics, mon.abilities);
 
     heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
   }
