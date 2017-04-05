@@ -9,6 +9,7 @@
 #include "event.h"
 #include "pc.h"
 
+/*
 npc::npc(std::string name, std::string description, uint32_t abilities,
          dice damage, dice speed, dice hp, std::vector<uint32_t> color, char symbol)
 {
@@ -21,7 +22,7 @@ npc::npc(std::string name, std::string description, uint32_t abilities,
   this->color = color[0];
   this->symbol = symbol;
 }
-
+*/
 
 void npc_delete(npc *n)
 {
@@ -68,8 +69,8 @@ void gen_monsters(dungeon_t *d)
     printf("Generating monster #%i \n", i);
     
     mon = d->monster_descriptions[rand_range(0, d->monster_descriptions.size() - 1)];
+    m = new npc();
     m = mon.create_npc();
-    memset(m, 0, sizeof (*m));
 
     do {
       room = rand_range(1, d->num_rooms - 1);
@@ -82,21 +83,7 @@ void gen_monsters(dungeon_t *d)
     } while (d->character_map[p[dim_y]][p[dim_x]]);
     m->position[dim_y] = p[dim_y];
     m->position[dim_x] = p[dim_x];
-    d->character_map[p[dim_y]][p[dim_x]] = m;
-    m->speed = mon.speed.roll();
-    m->alive = 1;
     m->sequence_number = ++d->character_sequence_number;
-    //m->characteristics = rand() & 0x0000000f;
-    m->characteristics = mon.abilities;
-    m->symbol = mon.get_symbol();
-    m->name = mon.name;
-    m->description = mon.description;
-    m->damage = mon.damage;
-    m->hp = mon.hitpoints.roll();
-    m->color = mon.color[0];
-    m->have_seen_pc = 0;
-    m->kills[kill_direct] = m->kills[kill_avenged] = 0;
-
     d->character_map[p[dim_y]][p[dim_x]] = m;
 
     printf("Monster characteristics: %i, Desc Abilities: %i \n", m->characteristics, mon.abilities);

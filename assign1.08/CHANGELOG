@@ -10,9 +10,9 @@
 -Added Item factory and created gen_items
 -Implemented ncurses colors
 
-
-
-
+#[2017-04-05]
+-Changed Factories to assign fields in factory
+-Added cleanup for items and item rendering
 
 
 

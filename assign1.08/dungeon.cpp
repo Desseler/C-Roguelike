@@ -503,6 +503,7 @@ static int empty_dungeon(dungeon_t *d)
         hardnessxy(x, y) = 255;
       }
       charxy(x, y) = NULL;
+      itemxy(x, y) = NULL;
     }
   }
   d->rooms = NULL;
@@ -669,6 +670,7 @@ void delete_dungeon(dungeon_t *d)
 {
   free(d->rooms);
   heap_delete(&d->events);
+  delete_items(d);
   memset(d->character_map, 0, sizeof (d->character_map));
 }
 
@@ -1079,4 +1081,5 @@ void new_dungeon(dungeon_t *d)
   io_calculate_offset(d);
 
   gen_monsters(d);
+  gen_items(d);
 }

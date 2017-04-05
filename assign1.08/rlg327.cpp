@@ -210,10 +210,11 @@ int main(int argc, char *argv[])
   srand(seed);
 
   printf("parsing descriptions\n\n");
-  parse_descriptions(&d);
   
   io_init_terminal();
   init_dungeon(&d);
+
+  parse_descriptions(&d);
 
   if (do_load) {
     read_dungeon(&d, load_file);

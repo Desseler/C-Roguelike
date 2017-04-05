@@ -8,11 +8,9 @@
 #include "item.h"
 #include "dungeon.h"
 
-
+/*
 item::item()
 {
-  //this->damage = new dice();
-  this->name = description = "";
 }
 
 item::item(std::string name, std::string description, object_type_t type,
@@ -32,6 +30,7 @@ item::item(std::string name, std::string description, object_type_t type,
   this->name = name;
   this->description = description;
 }
+*/
 
 char item::symbol()
 {
@@ -89,10 +88,10 @@ void gen_items(dungeon_t *d)
   pair_t p;
   object_description obj;
 
-  for (i = 0; i < 100; i++) {
+  for (i = 0; i < 50; i++) {
     obj = d->object_descriptions[rand_range(0, d->object_descriptions.size() - 1)];
+    o = new item();
     o = obj.create_item();
-    memset(o, 0, sizeof (*o));
 
     do {
       room = rand_range(1, d->num_rooms - 1);
@@ -107,6 +106,7 @@ void gen_items(dungeon_t *d)
     //o->position[dim_x] = p[dim_x];
     d->item_map[p[dim_y]][p[dim_x]] = o;
 
+    /*
     o->color = obj.color;
     o->hit = obj.hit.roll();
     o->dodge = obj.dodge.roll();
@@ -119,7 +119,22 @@ void gen_items(dungeon_t *d)
     o->type = obj.type;
     o->name = obj.name;
     o->description = obj.description;   
-
+    
     d->item_map[p[dim_y]][p[dim_x]] = o;
+    */
+  }
+}
+
+void delete_items(dungeon_t *d)
+{
+  int x;
+  int y;
+  for (y = 0; y < DUNGEON_Y; y++) {
+    for (x = 0; x < DUNGEON_X; x++) {
+      if(itemxy(x, y)) {
+	delete itemxy(x, y);
+	itemxy(x, y) = NULL;
+      }
+    }
   }
 }

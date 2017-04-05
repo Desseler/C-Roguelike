@@ -971,12 +971,39 @@ std::ostream &operator<<(std::ostream &o, object_description &od)
 
 item *object_description::create_item()
 {
-  return new item(this->name, this->description, this->type, this->hit, this->damage, this->dodge,
-		  this->defence, this->weight, this->speed, this->attribute, this->value, this->color);
+  item *o = new item();
+  
+  o->color = this->color;
+  o->hit = this->hit.roll();
+  o->dodge = this->dodge.roll();
+  o->defence = this->defence.roll();
+  o->weight = this->weight.roll();
+  o->speed = this->speed.roll();
+  o->attribute = this->attribute.roll();
+  o->value = this->value.roll();
+  o->damage = this->damage;
+  o->type = this->type;
+  o->name = this->name;
+  o->description = this->description;
+  
+  return o;
 }
 
 npc *monster_description::create_npc()
 {
-  return new npc(this->name, this->description, this->abilities, this->damage, this->speed,
-		 this->hitpoints, this->color, this->symbol);
+  npc *m = new npc();
+
+  m->speed = this->speed.roll();
+  m->alive = 1;
+  m->characteristics = this->abilities;
+  m->symbol = this->get_symbol();
+  m->name = this->name;
+  m->description = this->description;
+  m->damage = this->damage;
+  m->hp = this->hitpoints.roll();
+  m->color = this->color[0];
+  m->have_seen_pc = 0;
+  m->kills[kill_direct] = m->kills[kill_avenged] = 0;
+  
+  return m;
 }

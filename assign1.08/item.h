@@ -20,13 +20,16 @@ class item {
   int32_t hit, dodge, defence, weight, speed, attribute, value;
   dice damage;
 
-  item();
+  //item();
+  /*
   item(std::string name, std::string description, object_type_t type,
 		  dice hit, dice damage, dice dodge, dice defence, dice weight,
                   dice speed, dice attribute, dice value, uint32_t color);
+  */
   char symbol();
 };
 
 void gen_items(dungeon_t *d);
+void delete_items(dungeon_t *d);
 
 #endif
