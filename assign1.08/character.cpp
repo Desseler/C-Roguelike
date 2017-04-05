@@ -132,7 +132,7 @@ uint32_t can_see(dungeon_t *d, pair_t voyeur, pair_t exhibitionist, int is_pc)
     b = c - del[dim_x];
     for (i = 0; i <= del[dim_x]; i++) {
       if (is_pc) {
-        pc_learn_terrain(d->PC, first, mappair(first));
+        pc_learn_terrain(d->PC, first, mappair(first), d);
       }
       if ((mappair(first) < ter_floor) && i && (i != del[dim_x])) {
         return 0;
@@ -153,7 +153,7 @@ uint32_t can_see(dungeon_t *d, pair_t voyeur, pair_t exhibitionist, int is_pc)
     b = c - del[dim_y];
     for (i = 0; i <= del[dim_y]; i++) {
       if (is_pc) {
-        pc_learn_terrain(d->PC, first, mappair(first));
+        pc_learn_terrain(d->PC, first, mappair(first), d);
       }
       if ((mappair(first) < ter_floor) && i && (i != del[dim_y])) {
         return 0;

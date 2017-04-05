@@ -85,6 +85,8 @@ int main(int argc, char *argv[])
   char *load_file;
   char *pgm_file;
 
+  printf("Starting main\n\n");
+
   memset(&d, 0, sizeof (d));
 
   /* Default behavior: Seed with the time, generate a new dungeon, *
@@ -207,6 +209,9 @@ int main(int argc, char *argv[])
   printf("Seed is %ld.\n", seed);
   srand(seed);
 
+  printf("parsing descriptions\n\n");
+  parse_descriptions(&d);
+  
   io_init_terminal();
   init_dungeon(&d);
 
@@ -218,11 +223,12 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
   }
 
-  parse_descriptions(&d);
-  
+  printf("Starting config_pc\n\n");
   config_pc(&d);
+
+  printf("config_pc successful. Starting gen_monsters\n\n");
   gen_monsters(&d);
-  //gen_items(&d);
+  gen_items(&d);
 
   io_display(&d);
   while (pc_is_alive(&d) && dungeon_has_npcs(&d) && !d.quit) {
@@ -240,7 +246,7 @@ int main(int argc, char *argv[])
     write_dungeon(&d, save_file);
   }
 
-  printf(pc_is_alive(&d) ? victory : tombstone);
+  //printf(pc_is_alive(&d) ? victory : tombstone);
   printf("\nYou defended your life in the face of %u deadly beast%s.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon resident%s.\n",

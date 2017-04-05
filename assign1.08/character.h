@@ -6,6 +6,7 @@
 # include <string>
 # include "dims.h"
 # include "dice.h"
+# include <vector>
 
 typedef enum kill_type {
   kill_direct,
@@ -20,7 +21,8 @@ class character {
   int32_t speed, hp;
   dice damage;
   std::string name, description;
-  uint32_t alive, color;
+  uint32_t alive;
+  uint32_t color;
   /* Characters use to have a next_turn for the move queue.  Now that it is *
    * an event queue, there's no need for that here.  Instead it's in the    *
    * event.  Similarly, sequence_number was introduced in order to ensure   *

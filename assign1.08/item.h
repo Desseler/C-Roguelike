@@ -9,6 +9,9 @@
 # include "dice.h"
 # include "descriptions.h"
 
+typedef struct dungeon dungeon_t;
+
+
 class item {
  public:
   std::string name, description;

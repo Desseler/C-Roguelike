@@ -1,9 +1,13 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+
+#include "utils.h"
 #include "dice.h"
 #include "descriptions.h"
 #include "item.h"
+#include "dungeon.h"
+
 
 item::item()
 {
@@ -79,4 +83,43 @@ char item::symbol()
 
 void gen_items(dungeon_t *d)
 {
+  uint32_t i;
+  item *o;
+  uint32_t room;
+  pair_t p;
+  object_description obj;
+
+  for (i = 0; i < 100; i++) {
+    obj = d->object_descriptions[rand_range(0, d->object_descriptions.size() - 1)];
+    o = obj.create_item();
+    memset(o, 0, sizeof (*o));
+
+    do {
+      room = rand_range(1, d->num_rooms - 1);
+      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+			    (d->rooms[room].position[dim_y] +
+			     d->rooms[room].size[dim_y] - 1));
+      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+			    (d->rooms[room].position[dim_x] +
+			     d->rooms[room].size[dim_x] - 1));
+    } while (d->item_map[p[dim_y]][p[dim_x]]);
+    //o->position[dim_y] = p[dim_y];
+    //o->position[dim_x] = p[dim_x];
+    d->item_map[p[dim_y]][p[dim_x]] = o;
+
+    o->color = obj.color;
+    o->hit = obj.hit.roll();
+    o->dodge = obj.dodge.roll();
+    o->defence = obj.defence.roll();
+    o->weight = obj.weight.roll();
+    o->speed = obj.speed.roll();
+    o->attribute = obj.attribute.roll();
+    o->value = obj.value.roll();
+    o->damage = obj.damage;
+    o->type = obj.type;
+    o->name = obj.name;
+    o->description = obj.description;   
+
+    d->item_map[p[dim_y]][p[dim_x]] = o;
+  }
 }

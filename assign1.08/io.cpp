@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <vector>
 
 #include "io.h"
 #include "move.h"
@@ -9,6 +10,7 @@
 #include "pc.h"
 #include "utils.h"
 #include "dungeon.h"
+
 
 /* Same ugly hack we did in path.c */
 static dungeon_t *dungeon;
@@ -202,7 +204,8 @@ void io_display(dungeon_t *d)
 {
   uint32_t y, x;
   uint32_t illuminated;
-
+  
+  
   clear();
   for (y = 0; y < 21; y++) {
     for (x = 0; x < 80; x++) {
@@ -218,39 +221,51 @@ void io_display(dungeon_t *d)
                   character_get_pos(d->character_map[d->io_offset[dim_y] + y]
                                                     [d->io_offset[dim_x] + x]),
                   1)) {
-        mvaddch(y + 1, x,
+	attron(COLOR_PAIR(d->character_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x]->color)); 
+	mvaddch(y + 1, x,
                 character_get_symbol(d->character_map[d->io_offset[dim_y] + y]
                                                      [d->io_offset[dim_x] + x]));
+	attroff(COLOR_PAIR(d->character_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x]->color));
       } else {
-        switch (pc_learned_terrain(d->PC,
-                                   d->io_offset[dim_y] + y,
-                                   d->io_offset[dim_x] + x)) {
-        case ter_wall:
-        case ter_wall_immutable:
-        case ter_unknown:
-          mvaddch(y + 1, x, ' ');
-          break;
-        case ter_floor:
-        case ter_floor_room:
-          mvaddch(y + 1, x, '.');
-          break;
-        case ter_floor_hall:
-          mvaddch(y + 1, x, '#');
-          break;
-        case ter_debug:
-          mvaddch(y + 1, x, '*');
-          break;
-        case ter_stairs_up:
-          mvaddch(y + 1, x, '<');
-          break;
-        case ter_stairs_down:
-          mvaddch(y + 1, x, '>');
-          break;
-        default:
+
+	if (d->PC->known_item_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x])
+	  {
+	    attron(COLOR_PAIR(d->PC->known_item_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x]->color));
+	    mvaddch(y + 1, x,
+		    d->PC->known_item_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x]->symbol());
+	    attroff(COLOR_PAIR(d->PC->known_item_map[d->io_offset[dim_y] + y][d->io_offset[dim_x] + x]->color));
+	  } else {
+	
+	  switch (pc_learned_terrain(d->PC,
+				     d->io_offset[dim_y] + y,
+				     d->io_offset[dim_x] + x)) {
+	  case ter_wall:
+	  case ter_wall_immutable:
+	  case ter_unknown:
+	    mvaddch(y + 1, x, ' ');
+	    break;
+	  case ter_floor:
+	  case ter_floor_room:
+	    mvaddch(y + 1, x, '.');
+	    break;
+	  case ter_floor_hall:
+	    mvaddch(y + 1, x, '#');
+	    break;
+	  case ter_debug:
+	    mvaddch(y + 1, x, '*');
+	    break;
+	  case ter_stairs_up:
+	    mvaddch(y + 1, x, '<');
+	    break;
+	  case ter_stairs_down:
+	    mvaddch(y + 1, x, '>');
+	    break;
+	  default:
  /* Use zero as an error symbol, since it stands out somewhat, and it's *
   * not otherwise used.                                                 */
-          mvaddch(y + 1, x, '0');
-        }
+	    mvaddch(y + 1, x, '0');
+	  }
+	}
       }
       if (illuminated) {
         attroff(A_BOLD);

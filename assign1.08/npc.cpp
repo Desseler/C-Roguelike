@@ -12,14 +12,14 @@
 npc::npc(std::string name, std::string description, uint32_t abilities,
          dice damage, dice speed, dice hp, std::vector<uint32_t> color, char symbol)
 {
-  name = name;
-  description = description;
-  characteristics = (npc_characteristics_t) abilities;
-  damage = damage;
+  this->name = name;
+  this->description = description;
+  this->characteristics = (npc_characteristics_t) abilities;
+  this->damage = damage;
   this->speed = speed.roll();
   this->hp = hp.roll();
-  color = color;
-  symbol = symbol;
+  this->color = color[0];
+  this->symbol = symbol;
 }
 
 
@@ -46,6 +46,8 @@ static uint32_t max_monster_cells(dungeon_t *d)
 
 void gen_monsters(dungeon_t *d)
 {
+  printf("Starting gen_monsters\n\n");
+  
   uint32_t i;
   npc *m;
   uint32_t room;
@@ -60,8 +62,12 @@ void gen_monsters(dungeon_t *d)
     d->num_monsters = c;
   }
 
+  printf("Starting monster generation. Printing %i monsters.\n\n", d->num_monsters);
+
   for (i = 0; i < d->num_monsters; i++) {
-    mon = d->monster_descriptions[rand_range(0, d->monster_descriptions.size())];
+    printf("Generating monster #%i \n", i);
+    
+    mon = d->monster_descriptions[rand_range(0, d->monster_descriptions.size() - 1)];
     m = mon.create_npc();
     memset(m, 0, sizeof (*m));
 
@@ -77,15 +83,23 @@ void gen_monsters(dungeon_t *d)
     m->position[dim_y] = p[dim_y];
     m->position[dim_x] = p[dim_x];
     d->character_map[p[dim_y]][p[dim_x]] = m;
-    //m->speed = rand_range(5, 20);
+    m->speed = mon.speed.roll();
     m->alive = 1;
     m->sequence_number = ++d->character_sequence_number;
     //m->characteristics = rand() & 0x0000000f;
-    //m->symbol = symbol[m->characteristics];
+    m->characteristics = mon.abilities;
+    m->symbol = mon.get_symbol();
+    m->name = mon.name;
+    m->description = mon.description;
+    m->damage = mon.damage;
+    m->hp = mon.hitpoints.roll();
+    m->color = mon.color[0];
     m->have_seen_pc = 0;
     m->kills[kill_direct] = m->kills[kill_avenged] = 0;
 
     d->character_map[p[dim_y]][p[dim_x]] = m;
+
+    printf("Monster characteristics: %i, Desc Abilities: %i \n", m->characteristics, mon.abilities);
 
     heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
   }

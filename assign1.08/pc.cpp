@@ -168,10 +168,11 @@ uint32_t pc_in_room(dungeon_t *d, uint32_t room)
   return 0;
 }
 
-void pc_learn_terrain(pc *p, pair_t pos, terrain_type_t ter)
+void pc_learn_terrain(pc *p, pair_t pos, terrain_type_t ter, dungeon_t *d)
 {
   p->known_terrain[pos[dim_y]][pos[dim_x]] = ter;
   p->visible[pos[dim_y]][pos[dim_x]] = 1;
+  p->known_item_map[pos[dim_y]][pos[dim_x]] = d->item_map[pos[dim_y]][pos[dim_x]];
 }
 
 void pc_reset_visibility(pc *p)
