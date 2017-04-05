@@ -1,3 +1,18 @@
 Assignment 1.08 for Coms 327
 Made by Trevor Luster using code from Jeremy Shaeffer
 2017-03-30
+
+Implements monster and item generation from a monster_desc.txt 
+file and object_desc.txt file respectively. Both files must be 
+found in $HOME/.rlg327 or else the program will crash. Also
+implements rendering the instance's given color in ncurses.
+
+
+Compile command:
+	make rlg327
+
+Run command:
+	./rlg327
+
+Clean command:
+	make clean
