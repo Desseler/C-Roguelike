@@ -446,7 +446,10 @@ void io_display(dungeon_t *d)
   mvprintw(23, 0, "PC position is (%3d,%2d); offset is (%3d,%2d).",
            character_get_x(d->PC), character_get_y(d->PC),
            d->io_offset[dim_x], d->io_offset[dim_y]);
-
+  mvprintw(22, 0, "Health: ");
+  attron(COLOR_PAIR(COLOR_YELLOW));
+  mvprintw(22, 8, "%i", d->PC->hp);
+  attroff(COLOR_PAIR(COLOR_YELLOW));
   io_print_message_queue(0, 0);
 
   refresh();
@@ -734,6 +737,34 @@ static void io_list_monsters(dungeon_t *d)
   io_display(d);
 }
 
+void io_wear_item(dungeon_t *d)
+{
+}
+
+void io_take_off_item(dungeon_t *d)
+{
+}
+
+void io_drop_item(dungeon_t *d)
+{
+}
+
+void io_delete_item(dungeon_t *d)
+{
+}
+
+void io_list_inventory(dungeon_t *d)
+{
+}
+
+void io_list_equipment(dungeon_t *d)
+{
+}
+
+void io_inspect_item(dungeon_t *d)
+{
+}
+
 void io_handle_input(dungeon_t *d)
 {
   uint32_t fail_code;
@@ -864,6 +895,34 @@ void io_handle_input(dungeon_t *d)
                        "be no \"more\" prompt.");
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
+      break;
+    case 'w':
+      io_wear_item(d);
+      fail_code = 1;
+      break;
+    case 't':
+      io_take_off_item(d);
+      fail_code = 1;
+      break;
+    case 'd':
+      io_drop_item(d);
+      fail_code = 1;
+      break;
+    case 'x':
+      io_delete_item(d);
+      fail_code = 1;
+      break;
+    case 'i':
+      io_list_inventory(d);
+      fail_code = 1;
+      break;
+    case 'e':
+      io_list_equipment(d);
+      fail_code = 1;
+      break;
+    case 'I':
+      io_inspect_item(d);
+      fail_code = 1;
       break;
     default:
       /* Also not in the spec.  It's not always easy to figure out what *

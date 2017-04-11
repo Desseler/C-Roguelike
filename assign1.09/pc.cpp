@@ -55,6 +55,7 @@ void config_pc(dungeon_t *d)
   d->PC->kills[kill_direct] = d->PC->kills[kill_avenged] = 0;
   d->PC->color.push_back(COLOR_WHITE);
   d->PC->damage = &pc_dice;
+  d->PC->hp = 255;
   d->PC->name = "Isabella Garcia-Shapiro";
 
   d->character_map[character_get_y(d->PC)][character_get_x(d->PC)] = d->PC;

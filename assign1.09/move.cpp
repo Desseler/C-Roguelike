@@ -14,9 +14,38 @@
 #include "path.h"
 #include "event.h"
 #include "io.h"
+#include "object.h"
 
 void do_combat(dungeon_t *d, character *atk, character *def)
 {
+  if (character_is_alive(def)) {
+    int32_t dmg;
+    if (def == d->PC || atk == d->PC) {
+      dmg = atk->damage->roll();
+      def->hp -= dmg;
+      if(def->hp <= 0) {
+	character_die(def);
+	if (def != d->PC) {
+	  d->num_monsters--;
+	}
+	character_increment_dkills(atk);
+	character_increment_ikills(atk, (character_get_dkills(def) +
+					 character_get_ikills(def)));
+	if (atk == d->PC) {
+	  io_queue_message("You smite the %s", character_get_name(def));
+	}    
+      } else if (atk == d->PC) {
+	io_queue_message("Delivered %i damage to the %s. %i hp remaining", dmg, character_get_name(def), def->hp);
+      } else if (def == d->PC) {
+	io_queue_message("Took %i damage from the %s. %i hp remaining", dmg, character_get_name(atk), def->hp);
+      }
+      
+    } else {
+      
+    }
+  }
+  
+  /*
   if (character_is_alive(def)) {
     character_die(def);
     if (def != d->PC) {
@@ -30,6 +59,7 @@ void do_combat(dungeon_t *d, character *atk, character *def)
   if (atk == d->PC) {
     io_queue_message("You smite the %s", character_get_name(def));
   }
+  */
 }
 
 void move_character(dungeon_t *d, character *c, pair_t next)
@@ -233,6 +263,22 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
 
   if ((dir != '>') && (dir != '<') && (mappair(next) >= ter_floor)) {
     move_character(d, d->PC, next);
+    if(objpair(next)) {
+      int i;
+      for(i = 0; i < 10; i++) {
+	if(!d->PC->carry[i]) {
+	  d->PC->carry[i] = objpair(next);
+	  //objpair(next) = NULL;
+	  //delete objpair(next);
+	  //memset(d->objmap[next[dim_y]][next[dim_x]], 0, sizeof (object ));
+	  i = 10;
+	  io_queue_message("Picked up %s", objpair(next)->get_name());
+	}
+	if(i == 9) {
+	  io_queue_message("Carry inventory full. Did not pick up %s", objpair(next)->get_name());
+	}
+      }
+    }
     io_update_offset(d);
     dijkstra(d);
     dijkstra_tunnel(d);

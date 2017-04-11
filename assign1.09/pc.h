@@ -9,7 +9,19 @@
 
 class pc : public character {
  public:
-  object WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, RING[2], INVENTORY[10];
+  object * WEAPON;
+  object * OFFHAND;
+  object * RANGED;
+  object * ARMOR;
+  object * HELMET;
+  object * CLOAK;
+  object * GLOVES;
+  object * BOOTS;
+  object * AMULET;
+  object * LIGHT;
+  object * LHRING;
+  object * RHRING;
+  object * carry[10];
   terrain_type_t known_terrain[DUNGEON_Y][DUNGEON_X];
   unsigned char visible[DUNGEON_Y][DUNGEON_X];
 };
