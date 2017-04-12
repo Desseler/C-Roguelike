@@ -22,6 +22,17 @@ void do_combat(dungeon_t *d, character *atk, character *def)
     int32_t dmg;
     if (def == d->PC || atk == d->PC) {
       dmg = atk->damage->roll();
+      if(atk == d->PC) {
+	int i;
+	if(d->PC->equipment[0]) {
+	  dmg = d->PC->equipment[0]->damage.roll();
+	}
+	for (i = 1; i < 12; i++) {
+	  if(d->PC->equipment[i]) {
+	    dmg += d->PC->equipment[i]->damage.roll();
+	  }
+	}
+      }
       def->hp -= dmg;
       if(def->hp <= 0) {
 	character_die(def);

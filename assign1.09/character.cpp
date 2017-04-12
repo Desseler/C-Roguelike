@@ -53,6 +53,9 @@ char character_get_symbol(const character *c)
 
 uint32_t character_get_speed(const character *c)
 {
+  if (c->speed == 0) {
+    return 1;
+  }
   return c->speed;
 }
 

@@ -761,7 +761,7 @@ void io_equipment_display(dungeon_t *d)
   
 
   int i;
-  for (i = 0; i < 10; i ++) {
+  for (i = 0; i < 12; i ++) {
     if(d->PC->equipment[i]) {
       mvprintw(i + 5, 20, "%s  ", d->PC->equipment[i]->get_name());
     }
@@ -847,16 +847,41 @@ void io_wear_item(dungeon_t *d)
   if(d->PC->carry[i]) {
     if(!d->PC->equipment[d->PC->carry[i]->get_type() - 1] && d->PC->carry[i]) {
       io_queue_message("Equipped %s", d->PC->carry[i]->get_name());
+      d->PC->speed += d->PC->carry[i]->get_speed();
       d->PC->equipment[d->PC->carry[i]->get_type() - 1] = d->PC->carry[i];
       d->PC->carry[i] = NULL;
       
     } else if (d->PC->equipment[d->PC->carry[i]->get_type() - 1] && d->PC->carry[i]) {
+      if(d->PC->carry[i]->get_type() - 1 == 10) {
+	if(!(d->PC->equipment[11])) {
+	  io_queue_message("Equipped %s", d->PC->carry[i]->get_name());
+	  d->PC->speed += d->PC->carry[i]->get_speed();
+	  d->PC->equipment[11] = d->PC->carry[i];
+	  d->PC->carry[i] = NULL;
+	  io_display(d);
+	  return;
+	}
+	if(d->PC->equipment[11]) {
+	  io_queue_message("Equipped %s and swapped with %s", d->PC->carry[i]->get_name(), d->PC->equipment[11]->get_name());
+	  d->PC->speed += d->PC->carry[i]->get_speed();
+	  object *o = d->PC->equipment[11];
+	  d->PC->equipment[11] = d->PC->carry[i];
+	  d->PC->carry[i] = o;
+	  o = NULL;
+	  d->PC->speed -= d->PC->carry[i]->get_speed();
+	  io_display(d);
+	  return;
+	  
+	}
+      }
       io_queue_message("Equipped %s and swapped with %s", d->PC->carry[i]->get_name(), d->PC->equipment[d->PC->carry[i]->get_type() - 1]->get_name());
+      d->PC->speed += d->PC->carry[i]->get_speed();
       object *o = d->PC->equipment[d->PC->carry[i]->get_type() - 1];
       d->PC->equipment[d->PC->carry[i]->get_type() - 1] = d->PC->carry[i];
       d->PC->carry[i] = o;
       o = NULL;
-      
+      d->PC->speed -= d->PC->carry[i]->get_speed();
+
     }
   } else {
     io_queue_message("No item in inventory slot %i", i + 1);
@@ -932,6 +957,7 @@ void io_take_off_item(dungeon_t *d)
 
   if(d->PC->equipment[i]) {
     io_queue_message("Unequipped %s", d->PC->equipment[i]->get_name());
+    d->PC->speed -= d->PC->equipment[i]->get_speed();
     d->PC->carry[freeslot] = d->PC->equipment[i];
     d->PC->equipment[i] = NULL;
     
