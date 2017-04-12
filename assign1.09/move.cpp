@@ -52,7 +52,49 @@ void do_combat(dungeon_t *d, character *atk, character *def)
       }
       
     } else {
+      /*
+      pair_t move_list[8];
+      pair_t atk_move;
+      atk_move[dim_y] = def->position[dim_y];
+      atk_move[dim_x] = def->position[dim_x];
+      pair_t def_move;
+      int index = 0;
+      int found_move = 0;
       
+      for(int j = def->position[dim_y] - 1; j < def->position[dim_y] + 2; j++) {
+	for(int i = def->position[dim_x] - 1; i < def->position[dim_x] + 2; i++) {
+	  if(j != def->position[dim_y] && i != def->position[dim_x]){
+	    if(!charxy(i, j) && mapxy(i, j) >= ter_floor){
+	      move_list[index][dim_y] = j;
+	      move_list[index][dim_x] = i;
+	      index++;
+	    } else if (charxy(i, j) == atk) {
+	      move_list[index][dim_y] = j;
+	      move_list[index][dim_x] = i;
+	      index++;
+	    }
+	  }
+	}
+      }
+      while(found_move == 0) {
+	index = rand_range(0, 8);
+	if(move_list[index][dim_y] != 0 && move_list[index][dim_x] != 0) {
+	  def_move[dim_y] = move_list[index][dim_y];
+	  def_move[dim_x] = move_list[index][dim_x];
+	  found_move = 1;
+	}
+      }
+      
+      d->character_map[character_get_y(def)][character_get_x(def)] = NULL;
+      character_set_y(def, def_move[dim_y]);
+      character_set_x(def, def_move[dim_x]);
+      d->character_map[character_get_y(def)][character_get_x(def)] = def;
+      
+      d->character_map[character_get_y(atk)][character_get_x(atk)] = NULL;
+      character_set_y(atk, atk_move[dim_y]);
+      character_set_x(atk, atk_move[dim_x]);
+      d->character_map[character_get_y(atk)][character_get_x(atk)] = atk;
+      */
     }
   }
   

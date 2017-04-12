@@ -1,4 +1,15 @@
 Assignment 1.09 for Coms 327
-Made by Trevor Luster with solution code from Jeremy Shaeffer
-[2017-04-09]
+Made by Trevor Luster using code from Jeremy Shaeffer
+2017-04-09
 
+Implements Inventory management and combat using items and HP.
+
+
+Compile command:
+        make rlg327
+
+Run command:
+        ./rlg327
+
+Clean command:
+        make clean

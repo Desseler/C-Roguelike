@@ -906,7 +906,6 @@ void io_take_off_item(dungeon_t *d)
     }
   }
   
-  
   io_equipment_display(d);
   mvprintw(18, 0, "   Choose an item to unequip.                     ");
   mvprintw(19, 0, "   Hit any other key to cancel.                   ");
@@ -965,7 +964,6 @@ void io_take_off_item(dungeon_t *d)
     io_queue_message("No item in inventory slot %i", i + 1);
   }
   
-
   io_display(d);
 }
 
@@ -993,9 +991,6 @@ void io_drop_item(dungeon_t *d)
     io_queue_message("No item in inventory slot %i", i + 1);
   }
   
-  
-
-
   io_display(d);
 }
 
@@ -1022,9 +1017,6 @@ void io_delete_item(dungeon_t *d)
     io_queue_message("No item in inventory slot %i", i + 1);
   }
   
-  
-
-
   io_display(d);
 }
 
@@ -1062,18 +1054,34 @@ void io_inspect_item(dungeon_t *d)
     return;
   }
   if(d->PC->carry[i]) {
-    mvprintw(1, 0, "                                                  ");
-    mvprintw(2, 0, "                                                  ");
-    mvprintw(3, 0, "   Description for %s:                            ", d->PC->carry[i]->get_name());
-    mvprintw(4, 0, "                                                  ");
-    mvprintw(5, 0, "%s                                                ", d->PC->carry[i]->get_description());
+    mvprintw(1, 0, "                                                                                         ");
+    mvprintw(2, 0, "                                                                                         ");
+    mvprintw(3, 0, "      Description for %s:                                                                   ", d->PC->carry[i]->get_name());
+    mvprintw(4, 0, "                                                                                         ");
+    mvprintw(6, 0, "                                                                                         ");
+    mvprintw(7, 0, "                                                                                         ");
+    mvprintw(8, 0, "                                                                                         ");
+    mvprintw(9, 0, "                                                                                         ");
+    mvprintw(10, 0, "                                                                                         ");
+    mvprintw(11, 0, "                                                                                         ");
+    mvprintw(12, 0, "                                                                                         ");
+    mvprintw(13, 0, "                                                                                         ");
+    mvprintw(14, 0, "                                                                                         ");
+    mvprintw(15, 0, "                                                                                         ");
+    mvprintw(16, 0, "                                                                                         ");
+    mvprintw(17, 0, "                                                                                         ");
+    mvprintw(18, 0, "                                                                                         ");
+    mvprintw(19, 0, "                                                                                         ");
+    mvprintw(20, 0, "   Hit any key to continue.                                                              ");
+    mvprintw(21, 0, "                                                                                         ");
+    mvprintw(5, 0, "   %s   ", d->PC->carry[i]->get_description());
 
     refresh();
+    getch();
   } else {
     io_queue_message("No item in inventory slot %i", i + 1);
   }
   
-
   io_display(d);
 }
 
