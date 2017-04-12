@@ -267,15 +267,13 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
       int i;
       for(i = 0; i < 10; i++) {
 	if(!d->PC->carry[i]) {
-	  d->PC->carry[i] = objpair(next);
-	  //objpair(next) = NULL;
-	  //delete objpair(next);
-	  //memset(d->objmap[next[dim_y]][next[dim_x]], 0, sizeof (object ));
-	  i = 10;
 	  io_queue_message("Picked up %s", objpair(next)->get_name());
+	  d->PC->carry[i] = objpair(next);
+	  d->objmap[next[dim_y]][next[dim_x]] = d->PC->carry[i]->next;
+	  i = 10;
 	}
 	if(i == 9) {
-	  io_queue_message("Carry inventory full. Did not pick up %s", objpair(next)->get_name());
+	  io_queue_message("Inventory full. Did not pick up %s", objpair(next)->get_name());
 	}
       }
     }

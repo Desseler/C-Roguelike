@@ -81,6 +81,11 @@ const char *object::get_name()
   return name.c_str();
 }
 
+const char *object::get_description()
+{
+  return description.c_str();
+}
+
 int32_t object::get_speed()
 {
   return speed;

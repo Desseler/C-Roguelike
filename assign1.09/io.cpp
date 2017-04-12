@@ -737,32 +737,318 @@ static void io_list_monsters(dungeon_t *d)
   io_display(d);
 }
 
+void io_equipment_display(dungeon_t *d)
+{
+  mvprintw(1, 0, "                                                  ");
+  mvprintw(2, 0, "                                                  ");
+  mvprintw(3, 0, "   Equipment:                                     ");
+  mvprintw(4, 0, "                                                  ");
+  mvprintw(5, 0, "      1: Weapon   )                               ");
+  mvprintw(6, 0, "      2: Off-hand )                               ");
+  mvprintw(7, 0, "      3: Ranged   )                               ");
+  mvprintw(8, 0, "      4: Light    )                               ");
+  mvprintw(9, 0, "      5: Armor    )                               ");
+  mvprintw(10, 0, "      6: Helmet   )                               ");
+  mvprintw(11, 0, "      7: Cloak    )                               ");
+  mvprintw(12, 0, "      8: Gloves   )                               ");
+  mvprintw(13, 0, "      9: Boots    )                               ");
+  mvprintw(14, 0, "      0: Amulet   )                               ");
+  mvprintw(15, 0, "      -: LH Ring  )                               ");
+  mvprintw(16, 0, "      =: RH Ring  )                               ");
+  mvprintw(17, 0, "                                                  ");
+  mvprintw(18, 0, "                                                  ");
+  mvprintw(19, 0, "                                                  ");
+  
+
+  int i;
+  for (i = 0; i < 10; i ++) {
+    if(d->PC->equipment[i]) {
+      mvprintw(i + 5, 20, "%s  ", d->PC->equipment[i]->get_name());
+    }
+  }
+  
+}
+
+void io_carry_display(dungeon_t *d)
+{
+  mvprintw(1, 0, "                                                  ");
+  mvprintw(2, 0, "                                                  ");
+  mvprintw(3, 0, "   Inventory:                                     ");
+  mvprintw(4, 0, "                                                  ");
+  mvprintw(5, 0, "      1: )                                        ");
+  mvprintw(6, 0, "      2: )                                        ");
+  mvprintw(7, 0, "      3: )                                        ");
+  mvprintw(8, 0, "      4: )                                        ");
+  mvprintw(9, 0, "      5: )                                        ");
+  mvprintw(10, 0, "      6: )                                        ");
+  mvprintw(11, 0, "      7: )                                        ");
+  mvprintw(12, 0, "      8: )                                        ");
+  mvprintw(13, 0, "      9: )                                        ");
+  mvprintw(14, 0, "      0: )                                        ");
+  mvprintw(15, 0, "                                                  ");
+  mvprintw(16, 0, "                                                  ");
+  mvprintw(17, 0, "                                                  ");
+  
+  
+  int i;
+  for (i = 0; i < 10; i ++) {
+    if(d->PC->carry[i]) {
+      mvprintw(i + 5, 11, "%s  ", d->PC->carry[i]->get_name());
+    }
+  }
+}
+
+int32_t io_get_input_inventory()
+{
+  int key;
+  switch(key = getch()) {
+  case '1':
+    return 0;
+  case '2':
+    return 1;
+  case '3':
+    return 2;
+  case '4':
+    return 3;
+  case '5':
+    return 4;
+  case '6':
+    return 5;
+  case '7':
+    return 6;
+  case '8':
+    return 7;
+  case '9':
+    return 8;
+  case '0':
+    return 9;
+  default:
+    return -1;
+  }
+}
+
+
+
 void io_wear_item(dungeon_t *d)
 {
+  int32_t i;
+  
+  io_carry_display(d);
+  mvprintw(16, 0, "   Choose an item to equip.                       ");
+  mvprintw(17, 0, "   Hit any other key to cancel.                   ");
+  mvprintw(18, 0, "                                                  ");  
+  refresh();
+
+  i = io_get_input_inventory();
+  if(i == -1){
+    io_display(d);
+    return;
+  }
+  if(d->PC->carry[i]) {
+    if(!d->PC->equipment[d->PC->carry[i]->get_type() - 1] && d->PC->carry[i]) {
+      io_queue_message("Equipped %s", d->PC->carry[i]->get_name());
+      d->PC->equipment[d->PC->carry[i]->get_type() - 1] = d->PC->carry[i];
+      d->PC->carry[i] = NULL;
+      
+    } else if (d->PC->equipment[d->PC->carry[i]->get_type() - 1] && d->PC->carry[i]) {
+      io_queue_message("Equipped %s and swapped with %s", d->PC->carry[i]->get_name(), d->PC->equipment[d->PC->carry[i]->get_type() - 1]->get_name());
+      object *o = d->PC->equipment[d->PC->carry[i]->get_type() - 1];
+      d->PC->equipment[d->PC->carry[i]->get_type() - 1] = d->PC->carry[i];
+      d->PC->carry[i] = o;
+      o = NULL;
+      
+    }
+  } else {
+    io_queue_message("No item in inventory slot %i", i + 1);
+  }
+
+  io_display(d);
 }
 
 void io_take_off_item(dungeon_t *d)
 {
+  int32_t i;
+  int32_t freeslot;
+  
+  for(freeslot = 0; freeslot < 10; freeslot++) {
+    if(!(d->PC->carry[freeslot])) {
+      break;
+    }
+    if(freeslot == 9) {
+      io_queue_message("Carry inventory full.");
+      io_display(d);
+      return;
+    }
+  }
+  
+  
+  io_equipment_display(d);
+  mvprintw(18, 0, "   Choose an item to unequip.                     ");
+  mvprintw(19, 0, "   Hit any other key to cancel.                   ");
+  mvprintw(20, 0, "                                                  ");
+  refresh();
+  
+  switch(i = getch()) {
+  case '1':
+    i = 0;
+    break;
+  case '2':
+    i = 1;
+    break;
+  case '3':
+    i = 2;
+    break;
+  case '4':
+    i = 3;
+    break;
+  case '5':
+    i = 4;
+    break;
+  case '6':
+    i = 5;
+    break;
+  case '7':
+    i = 6;
+    break;
+  case '8':
+    i = 7;
+    break;
+  case '9':
+    i = 8;
+    break;
+  case '0':
+    i = 9;
+    break;
+  case '-':
+    i = 10;
+    break;
+  case '=':
+    i = 11;
+    break;
+  default:
+    io_display(d);
+    return;
+  }
+
+  if(d->PC->equipment[i]) {
+    io_queue_message("Unequipped %s", d->PC->equipment[i]->get_name());
+    d->PC->carry[freeslot] = d->PC->equipment[i];
+    d->PC->equipment[i] = NULL;
+    
+  } else {
+    io_queue_message("No item in inventory slot %i", i + 1);
+  }
+  
+
+  io_display(d);
 }
 
 void io_drop_item(dungeon_t *d)
 {
+  int32_t i;
+  
+  io_carry_display(d);
+  mvprintw(16, 0, "   Choose an item to drop on the floor.           ");
+  mvprintw(17, 0, "   Hit any other key to cancel.                   ");
+  mvprintw(18, 0, "                                                  ");  
+  refresh();
+  
+  i = io_get_input_inventory();
+  if(i == -1){
+    io_display(d);
+    return;
+  }
+  if(d->PC->carry[i]) {
+    io_queue_message("Dropped %s", d->PC->carry[i]->get_name());
+    d->PC->carry[i]->next = objpair(d->PC->position);
+    objpair(d->PC->position) = d->PC->carry[i];
+    d->PC->carry[i] = NULL;
+  } else {
+    io_queue_message("No item in inventory slot %i", i + 1);
+  }
+  
+  
+
+
+  io_display(d);
 }
 
 void io_delete_item(dungeon_t *d)
 {
+  int32_t i;
+  
+  io_carry_display(d);
+  mvprintw(16, 0, "   Choose an item to delete.                      ");
+  mvprintw(17, 0, "   Hit any other key to cancel.                   ");
+  mvprintw(18, 0, "                                                  ");
+  refresh();
+  
+  i = io_get_input_inventory();
+  if(i == -1){
+    io_display(d);
+    return;
+  }
+  if(d->PC->carry[i]) {
+    io_queue_message("Deleted %s", d->PC->carry[i]->get_name());
+    delete d->PC->carry[i];
+    d->PC->carry[i] = NULL;
+  } else {
+    io_queue_message("No item in inventory slot %i", i + 1);
+  }
+  
+  
+
+
+  io_display(d);
 }
 
 void io_list_inventory(dungeon_t *d)
 {
+  io_carry_display(d);
+  mvprintw(16, 0, "   Hit any key to continue.                       ");
+  refresh();  
+  getch();
+  io_display(d);
 }
 
 void io_list_equipment(dungeon_t *d)
 {
+  io_equipment_display(d);
+  mvprintw(18, 0, "   Hit any key to continue.                       ");
+  refresh();
+  getch();
+  io_display(d);
 }
 
 void io_inspect_item(dungeon_t *d)
 {
+  int32_t i;
+  
+  io_carry_display(d);
+  mvprintw(16, 0, "   Choose an item to inspect.                     ");
+  mvprintw(17, 0, "   Hit any other key to cancel.                   ");
+  mvprintw(18, 0, "                                                  ");
+  refresh();
+  
+  i = io_get_input_inventory();
+  if(i == -1){
+    io_display(d);
+    return;
+  }
+  if(d->PC->carry[i]) {
+    mvprintw(1, 0, "                                                  ");
+    mvprintw(2, 0, "                                                  ");
+    mvprintw(3, 0, "   Description for %s:                            ", d->PC->carry[i]->get_name());
+    mvprintw(4, 0, "                                                  ");
+    mvprintw(5, 0, "%s                                                ", d->PC->carry[i]->get_description());
+
+    refresh();
+  } else {
+    io_queue_message("No item in inventory slot %i", i + 1);
+  }
+  
+
+  io_display(d);
 }
 
 void io_handle_input(dungeon_t *d)
