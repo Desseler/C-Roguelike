@@ -1,8 +1,90 @@
+#[2017-01-24]
+-Added initilization for blank dungeon and random rock hardness
+-Room collision check
+-Room generator
+
+#[2017-02-01]
+-Loading features
+-Revamped assignment1.01 to fit this project
+-Added pointers for dynamically sized array
+-Broke everything
+
+#[2017-02-07]
+-Began implementing Jeremy's tunneling Dijkstra's algorithm to work for path finding
+
+#[2017-02-08]
+-Finished algorithm implenentation
+
+#[2017-02-22]
+-Movement and heap turns
+
+#[2017-02-27]
+-Stair generation
+
+#[2017-03-03]
+-PC Movement
+-Dungeon view in ncurses
+
+#[2017-03-05]
+-Stair implementation
+-Kill and avenged count implemented and consistent through floors
+
+#[2017-03-18]
+-Changed file type to .cpp for relevant .c files
+-Modified header files for C code
+
+#[2017-03-20]
+-Implemented character as a class. Still needs constructor and destructor
+
+#[2017-03-22]
+-Finished character, npc, and pc classes
+-Added accessors and mutators for created classes to be used by C code
+-Added extern C for name mangling
+-Finished implementing C++ accessors and mutators in C code.
+-Added Fog of War
+-Everything compiles, but it doesn't link properly
+
+#[2017-03-27]
+-Renamed files from *.c to *.cpp
+-Fixed compile errors
+
+#[2017-03-28]
+-Added parser.h and parser.cpp
+-Implemented parser
+-Changed main method to no longer generate dungeon nor initialize game
+-Main method parses ~/.rlg327/monster_desc.txt and outputs to console
+
+#[2017-03-29]
+-Added check in parser for incomplete monster descriptions to not print incomplete descriptions
+
+#[2017-04-03]
+-Added item class. Made object_description and monster_description class factories
+
+#[2017-04-04]
+-Cleaned up compilation errors.
+-Modified gen_monsters to use descriptions
+-Added Item factory and created gen_items
+-Implemented ncurses colors
+
+#[2017-04-05]
+-Changed Factories to assign fields in factory
+-Added cleanup for items and item rendering
+
+#[2017-04-10]
+-Inventory for PC
+-Hand-to-hand combat
+-Begun adding inventory management
+
+#[2017-04-12]
+-Inventory management
+-Item inspection
+-Items now affect damage and speed
+
 #[2017-04-15]
--Created project
-
-
-
+-Begun adding ranged combat
+-Begun adding io_select_tile in io.cpp
+-Implemented do_ranged_combat in move.cpp
+-Implemented armor to reduce damage taken for PC
 
 
 

@@ -9,6 +9,9 @@ class character;
 
 typedef struct dungeon dungeon_t;
 
+void do_ranged_combat(dungeon_t *d,
+		      character *atk,
+		      character *def);
 void next_move(dungeon_t *d,
                character *c,
                pair_t goal_pos,

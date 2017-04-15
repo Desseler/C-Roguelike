@@ -2,3 +2,12 @@ Assignment 2.00/1.10 for Coms 327
 Made by Trevor Luster with solution code from Jeremy Shaeffer
 [2017-04-15]
 
+Added ranged combat.
+
+Added 3 bars of meter for the PC to powerful special ranged moves.
+
+Implemented PC equipment defence. Armor damage scaling uses the
+knockback calculation algorithm from Super Smash Bros. Melee. It
+has been modified heavily to work with this game's variables and
+scale properly. The algorithm used can be found here:
+https://www.ssbwiki.com/Knockback#Melee_onward

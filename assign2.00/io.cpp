@@ -1149,6 +1149,11 @@ uint32_t io_expunge_in(dungeon_t *d)
   return 1;
 }
 
+void io_select_tile(dungeon_t*d)
+{
+  
+}
+
 void io_handle_input(dungeon_t *d)
 {
   uint32_t fail_code;

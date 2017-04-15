@@ -16,13 +16,30 @@
 #include "io.h"
 #include "object.h"
 
+uint32_t calculate_damage(dungeon_t *d, character *def, uint32_t damage)
+{
+  uint32_t dmg, i;
+  int32_t defence;
+  if (def == d->PC) {
+    for (i = defence = 0; i < num_eq_slots; i++) {
+      if (d->PC->eq[i]) {
+	defence += d->PC->eq[i]->get_defence();	
+      }
+    }
+    dmg = ((damage/2)*(200/(defence+100)));
+    return dmg;
+  } else {
+    return damage;
+  }
+}
+
 void do_combat(dungeon_t *d, character *atk, character *def)
 {
   uint32_t damage, i;
 
   if (character_is_alive(def)) {
     if (atk != d->PC) {
-      damage = atk->damage->roll();
+      damage = calculate_damage(d, def, atk->damage->roll());
       io_queue_message("The %s hits you for %d.", atk->name, damage);
     } else {
       for (i = damage = 0; i < num_eq_slots; i++) {
@@ -49,6 +66,55 @@ void do_combat(dungeon_t *d, character *atk, character *def)
                                        character_get_ikills(def)));
       if (def != d->PC) {
         d->num_monsters--;
+      }
+      charpair(def->position) = NULL;
+    } else {
+      def->hp -= damage;
+    }
+
+    if (def != d->PC) {
+      d->num_monsters--;
+    }
+  }
+}
+
+void do_ranged_combat(dungeon_t *d, character *atk, character *def)
+{
+  uint32_t damage, i;
+
+  if (character_is_alive(def)) {
+    if (atk != d->PC) {
+      damage = calculate_damage(d, def, atk->damage->roll());
+      io_queue_message("The %s shoots you for %d.", atk->name, damage);
+    } else {damage = calculate_damage(d, def, atk->damage->roll());
+      damage = 0;
+      for (i = 2; i < num_eq_slots; i++) {
+	if (i == eq_slot_ranged && !d->PC->eq[i]) {
+	  io_queue_message("You have no ranged weapon equipped.");
+	  return;
+	} else if (i == eq_slot_ranged && d->PC->eq[i]) {
+	  damage += d->PC->eq[i]->roll_dice();
+	} else if (d->PC->eq[i]) {
+	  damage += (d->PC->eq[i]->roll_dice() / 4);
+	}
+      }
+      io_queue_message("You shoot the %s for %d.", def->name, damage);
+    }
+
+    if (damage >= def->hp) {
+      if (atk != d->PC) {
+	io_queue_message("You die.");
+	io_queue_message(""); /* Extra message to force pause on "more" */
+      } else {
+	io_queue_message("The %s dies.", def->name);
+      }
+      def->hp = 0;
+      def->alive = 0;
+      character_increment_dkills(atk);
+      character_increment_ikills(atk, (character_get_dkills(def) +
+				       character_get_ikills(def)));
+      if (def != d->PC) {
+	d->num_monsters--;
       }
       charpair(def->position) = NULL;
     } else {
