@@ -35,11 +35,20 @@ uint32_t calculate_damage(dungeon_t *d, character *def, uint32_t damage)
 
 void do_combat(dungeon_t *d, character *atk, character *def)
 {
-  uint32_t damage, i;
+  uint32_t damage, meter_damage, i;
 
   if (character_is_alive(def)) {
     if (atk != d->PC) {
       damage = calculate_damage(d, def, atk->damage->roll());
+      meter_damage = damage;
+      if (meter_damage > 40) {
+	meter_damage = 40;
+      }
+      if ((d->PC->meter + meter_damage) > 300) {
+	d->PC->meter = 300;
+      } else {
+	d->PC->meter += meter_damage;
+      }
       io_queue_message("The %s hits you for %d.", atk->name, damage);
     } else {
       for (i = damage = 0; i < num_eq_slots; i++) {
@@ -48,6 +57,15 @@ void do_combat(dungeon_t *d, character *atk, character *def)
         } else if (d->PC->eq[i]) {
           damage += d->PC->eq[i]->roll_dice();
         }
+      }
+      meter_damage = damage;
+      if (meter_damage > 40) {
+	meter_damage = 40;
+      }
+      if ((d->PC->meter + meter_damage) > 300) {
+	d->PC->meter = 300;
+      } else {
+	d->PC->meter += meter_damage;
       }
       io_queue_message("You hit the %s for %d.", def->name, damage);
     }
@@ -80,13 +98,23 @@ void do_combat(dungeon_t *d, character *atk, character *def)
 
 void do_ranged_combat(dungeon_t *d, character *atk, character *def)
 {
-  uint32_t damage, i;
+  uint32_t damage, meter_damage, i;
 
   if (character_is_alive(def)) {
     if (atk != d->PC) {
       damage = calculate_damage(d, def, atk->damage->roll());
+      meter_damage = damage;
+      if (meter_damage > 40) {
+	meter_damage = 40;
+      }
+      if ((d->PC->meter + meter_damage) > 300) {
+	d->PC->meter = 300;
+      } else {
+	d->PC->meter += meter_damage;
+      }
       io_queue_message("The %s shoots you for %d.", atk->name, damage);
-    } else {damage = calculate_damage(d, def, atk->damage->roll());
+      io_queue_message("");
+    } else {
       damage = 0;
       for (i = 2; i < num_eq_slots; i++) {
 	if (i == eq_slot_ranged && !d->PC->eq[i]) {
@@ -98,7 +126,17 @@ void do_ranged_combat(dungeon_t *d, character *atk, character *def)
 	  damage += (d->PC->eq[i]->roll_dice() / 4);
 	}
       }
+      meter_damage = damage;
+      if (meter_damage > 40) {
+	meter_damage = 40;
+      }
+      if ((d->PC->meter + meter_damage) > 300) {
+	d->PC->meter = 300;
+      } else {
+	d->PC->meter += meter_damage;
+      }
       io_queue_message("You shoot the %s for %d.", def->name, damage);
+      io_queue_message("");
     }
 
     if (damage >= def->hp) {
@@ -125,6 +163,89 @@ void do_ranged_combat(dungeon_t *d, character *atk, character *def)
       d->num_monsters--;
     }
   }
+}
+
+/* special_level denotes the type of special move being used.                         *
+ * 0 = NPC Hadouken/Special                                                           *
+ * 1 = Regular Hadouken (Uses no meter)                                               *
+ * 2 = EX Hadouken (Uses 1 meter. No meter build on hit)                              *
+ * 3 = Shinku Hadouken (Uses 3 meter. No meter build on hit. Inflicts splash damage)  */
+void do_special_combat(dungeon_t *d, character *atk, character *def, uint32_t special_level)
+{
+  uint32_t damage, meter_damage, i;
+
+  if (character_is_alive(def)) {
+    if (atk != d->PC) {
+      damage = calculate_damage(d, def, atk->damage->roll());
+      meter_damage = damage;
+      if (meter_damage > 40) {
+	meter_damage = 40;
+      }
+      if ((d->PC->meter + meter_damage) > 300) {
+	d->PC->meter = 300;
+      } else {
+	d->PC->meter += meter_damage;
+      }
+      io_queue_message("The %s shoots you for %d.", atk->name, damage);
+      io_queue_message("");
+    } else {
+      damage = 0;
+      for (i = eq_slot_amulet; i < num_eq_slots; i++) {
+	if (i == eq_slot_amulet && !d->PC->eq[i]) {
+	  damage += atk->damage->roll();
+	} else if (d->PC->eq[i]) {
+	  damage += ((d->PC->eq[i]->roll_dice() / 2) * (special_level * 2));
+	}
+      }
+      if (special_level == 1) {
+	meter_damage = damage;
+	if (meter_damage > 40) {
+	  meter_damage = 40;
+	}
+	if ((d->PC->meter + meter_damage) > 300) {
+	  d->PC->meter = 300;
+	} else {
+	  d->PC->meter += meter_damage;
+	}
+	io_queue_message("Hadouken!");
+      }
+      if (special_level == 2) {
+	damage += 1000;
+	d->PC->meter -= 100;
+	io_queue_message("Strike!");
+      }
+      if (special_level == 3) {
+	damage += 3000;
+	d->PC->meter = 0;
+	io_queue_message("Shinku Hadouken!!!");
+      }
+      io_queue_message("You shoot the %s for %d.", def->name, damage);
+      io_queue_message("");
+    }
+    if (damage >= def->hp) {
+      if (atk != d->PC) {
+	io_queue_message("You die.");
+	io_queue_message(""); /* Extra message to force pause on "more" */
+      } else {
+	io_queue_message("The %s dies.", def->name);
+      }
+      def->hp = 0;
+      def->alive = 0;
+      character_increment_dkills(atk);
+      character_increment_ikills(atk, (character_get_dkills(def) +
+				       character_get_ikills(def)));
+      if (def != d->PC) {
+	d->num_monsters--;
+      }
+      charpair(def->position) = NULL;
+    } else {
+      def->hp -= damage;
+    }
+
+    if (def != d->PC) {
+      d->num_monsters--;
+    }
+  }  
 }
 
 void move_character(dungeon_t *d, character *c, pair_t next)

@@ -373,6 +373,12 @@ void io_display(dungeon_t *d)
                                         d->io_offset[dim_x] + pos[dim_x]))) {
         attron(A_BOLD);
       }
+      if (d->io_offset[dim_y] + pos[dim_y] == d->cursor[dim_y] &&
+	  d->io_offset[dim_x] + pos[dim_x] == d->cursor[dim_x]) {
+	if(d->cursor[dim_y] != 0) {
+	  attron(A_STANDOUT);
+	}
+      }
       if (d->character_map[d->io_offset[dim_y] + pos[dim_y]]
                           [d->io_offset[dim_x] + pos[dim_x]] &&
           can_see(d,
@@ -440,9 +446,57 @@ void io_display(dungeon_t *d)
       if (illuminated) {
         attroff(A_BOLD);
       }
+      if (d->io_offset[dim_y] + pos[dim_y] == d->cursor[dim_y] &&
+	  d->io_offset[dim_x] + pos[dim_x] == d->cursor[dim_x]) {
+	if(d->cursor[dim_y] != 0) {
+	  attroff(A_STANDOUT);
+	}
+      }
     }
   }
+  /* Print PC Health */
+  mvprintw(22, 0, "PC Health: ");
+  attron(COLOR_PAIR(COLOR_YELLOW));
+  mvprintw(22, 11, "%i", d->PC->hp);
+  attroff(COLOR_PAIR(COLOR_YELLOW));
+  
+  /* Print PC meter */
+  uint32_t i, scaled_meter;
+  
+  attron(COLOR_PAIR(COLOR_BLUE));
+  mvprintw(22, 18, "EX: |     |     |     |");
+  if(d->PC->meter == 300) {
+    attron(COLOR_PAIR(COLOR_CYAN));
+    mvprintw(22, 18, "CA: |     |     |     |");
+    attroff(COLOR_PAIR(COLOR_CYAN));
+  }
+  attroff(COLOR_PAIR(COLOR_BLUE));
 
+  scaled_meter = (d->PC->meter /20);
+  if(scaled_meter > 5) {
+    scaled_meter++;
+  }
+  if(scaled_meter > 11) {
+    scaled_meter++;
+  }
+  for(i = 0; i < scaled_meter; i++) {
+    if(i == 5 || i == 11) {
+      i++;
+    }
+    attron(COLOR_PAIR(COLOR_BLUE));
+    if(d->PC->meter == 300) {
+      attron(COLOR_PAIR(COLOR_CYAN));
+    }
+    attron(A_STANDOUT);
+    mvprintw(22, 23 + i, " ");
+    if(d->PC->meter == 300) {
+      attroff(COLOR_PAIR(COLOR_CYAN));
+    }
+    attroff(A_STANDOUT);
+    attroff(COLOR_PAIR(COLOR_BLUE));
+  }
+  
+  
   mvprintw(23, 0, "PC position is (%3d,%2d); offset is (%3d,%2d).",
            character_get_x(d->PC), character_get_y(d->PC),
            d->io_offset[dim_x], d->io_offset[dim_y]);
@@ -1149,9 +1203,181 @@ uint32_t io_expunge_in(dungeon_t *d)
   return 1;
 }
 
-void io_select_tile(dungeon_t*d)
+uint32_t io_select_tile(dungeon_t*d)
 {
+  int32_t key;
+  pair_t cursor_vision;
+  uint32_t fail_code;
+
   
+  do {
+    if ((key = getch()) == 27 /* ESC */) {
+      d->cursor[dim_y] = 0;
+      d->cursor[dim_x] = 0;
+      io_calculate_offset(d);
+      io_display(d);
+      return 1;
+    }
+
+    cursor_vision[dim_y] = d->cursor[dim_y];
+    cursor_vision[dim_x] = d->cursor[dim_x];
+    
+    switch (key) {
+    case '7':
+    case 'y':
+    case KEY_HOME:
+      cursor_vision[dim_y]--;
+      cursor_vision[dim_x]--;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]--;
+	d->cursor[dim_x]--;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '8':
+    case 'k':
+    case KEY_UP:
+      cursor_vision[dim_y]--;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]--;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '9':
+    case 'u':
+    case KEY_PPAGE:
+      cursor_vision[dim_y]--;
+      cursor_vision[dim_x]++;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]--;
+	d->cursor[dim_x]++;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '6':
+    case 'l':
+    case KEY_RIGHT:
+      cursor_vision[dim_x]++;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_x]++;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '3':
+    case 'n':
+    case KEY_NPAGE:
+      cursor_vision[dim_y]++;
+      cursor_vision[dim_x]++;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]++;
+	d->cursor[dim_x]++;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '2':
+    case 'j':
+    case KEY_DOWN:
+      cursor_vision[dim_y]++;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]++;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '1':
+    case 'b':
+    case KEY_END:
+      cursor_vision[dim_y]++;
+      cursor_vision[dim_x]--;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_y]++;
+	d->cursor[dim_x]--;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case '4':
+    case 'h':
+    case KEY_LEFT:
+      cursor_vision[dim_x]--;
+      if (can_see(d, d->PC->position, cursor_vision, 1, 0)) {
+	d->cursor[dim_x]--;
+      } else {
+	io_queue_message("Can't select outside PC line of sight.");
+      }
+      fail_code = 1;
+      break;
+    case 'r':
+      if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
+	if (d->PC->eq[eq_slot_ranged]) {
+	  do_ranged_combat(d, d->PC, charpair(d->cursor));
+	  fail_code = 0;
+	} else {
+	  io_queue_message("You have no ranged weapon equipped.");
+	  fail_code = 1;
+	}
+      } else {
+	io_queue_message("No monster to attack.");
+	fail_code = 1;
+      }
+      break;
+    case 'z':
+      if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
+	do_special_combat(d, d->PC, charpair(d->cursor), 1);
+	fail_code = 0;
+      } else {
+	io_queue_message("No monster to attack.");
+	fail_code = 1;
+      }
+      break;
+    case 'x':	
+      if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
+	if(d->PC->meter >= 100) { 
+	  do_special_combat(d, d->PC, charpair(d->cursor), 2);
+	} else {
+	  do_special_combat(d, d->PC, charpair(d->cursor), 1);
+	}
+	fail_code = 0;
+      } else {
+	io_queue_message("No monster to attack.");
+	fail_code = 1;
+      }
+      break;
+    case 'c':
+      if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
+	if(d->PC->meter == 300) {
+	  do_special_combat(d, d->PC, charpair(d->cursor), 3);
+	} else {
+	  do_special_combat(d, d->PC, charpair(d->cursor), 1);
+	}
+	fail_code = 0;
+      } else {
+	io_queue_message("No monster to attack.");
+	fail_code = 1;
+      }
+      break;
+    default:
+      fail_code = 1;
+      break;
+    }
+    io_display(d);
+  } while (fail_code);
+  d->cursor[dim_y] = 0;
+  d->cursor[dim_x] = 0;
+  
+  return 0;
 }
 
 void io_handle_input(dungeon_t *d)
@@ -1254,6 +1480,11 @@ void io_handle_input(dungeon_t *d)
     case 'L':
       io_look_mode(d);
       fail_code = 1;
+      break;
+    case 'r':
+      d->cursor[dim_y] = d->PC->position[dim_y];
+      d->cursor[dim_x] = d->PC->position[dim_x];
+      fail_code = io_select_tile(d);
       break;
     case 'g':
       /* Teleport the PC to a random place in the dungeon.              */

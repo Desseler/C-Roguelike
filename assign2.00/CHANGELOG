@@ -81,11 +81,11 @@
 -Items now affect damage and speed
 
 #[2017-04-15]
--Begun adding ranged combat
--Begun adding io_select_tile in io.cpp
--Implemented do_ranged_combat in move.cpp
--Implemented armor to reduce damage taken for PC
-
+-Ranged combat
+-Tile selector/cursor
+-Equipment defence now reduces damage taken for PC
+-Special meter
+-Ranged special attacks with meter
 
 
 

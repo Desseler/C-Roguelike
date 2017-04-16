@@ -91,6 +91,7 @@ typedef struct dungeon {
   uint32_t time;
   uint32_t quit;
   pair_t io_offset;
+  pair_t cursor;
   std::vector<monster_description> monster_descriptions;
   std::vector<object_description> object_descriptions;
 } dungeon_t;

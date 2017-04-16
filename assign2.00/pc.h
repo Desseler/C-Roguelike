@@ -32,6 +32,7 @@ class pc : public character {
   int32_t get_first_open_inventory_slot();
   object *from_pile(dungeon_t *d, pair_t pos);
  public:
+  uint32_t meter; /* Special power bar. Contains between 0 and 300 */
   terrain_type_t known_terrain[DUNGEON_Y][DUNGEON_X];
   unsigned char visible[DUNGEON_Y][DUNGEON_X];
   object *eq[num_eq_slots];
