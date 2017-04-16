@@ -2,12 +2,82 @@ Assignment 2.00/1.10 for Coms 327
 Made by Trevor Luster with solution code from Jeremy Shaeffer
 [2017-04-15]
 
-Added ranged combat.
 
-Added 3 bars of meter for the PC to powerful special ranged moves.
 
-Implemented PC equipment defence. Armor damage scaling uses the
-knockback calculation algorithm from Super Smash Bros. Melee. It
-has been modified heavily to work with this game's variables and
-scale properly. The algorithm used can be found here:
+**Added a tile selector.**
+Allows selection of tiles within PC field of view. Tile selector
+is activated with input 'r'. Once in selector mode, you can move
+around with standard movement keys and leave selector mode by
+pressing ESC. There are 5 main functions in selector mode:
+
+'r': Performs a ranged attack on the highlighted monster
+'z': Performs a Hadouken on the highlighted monster
+'x': Performs an EX Hadouken on the highlighted monster
+'c': Performs a Shinku Hadouken on the highlighted monster
+'i' & 'I': Inspects the highlighted monster. Shows name, description
+and basic stats
+
+
+**Added ranged combat.**
+Used by pressing 'r' in tile selector mode. If a monster is
+selected and the PC has equipment in eq_slot_ranged, then ranged combat
+is performed and the PC's turn is spent. Else, nothing happens and PC
+does not lose turn. Damage is calculated as such:
+
+-Full damage from item in eq_slot_ranged
+-No damage added from eq_slot_weapon or eq_slot_offhand
+-1/4 damage added from every other equipped item
+
+* Note: The default object_desc.txt does not contain a ranged weapon. An *
+* alternate with a ranged weapon has been included                       *
+
+
+**Added 3 bars of Super Combo Gauge, AKA "Meter", for the PC.**
+This is based on the Super Combo Gauge from the Street Fighter series.
+Specifically, it is designed like its incarnation in Street Fighter V.
+The PC starts with 0 meter and has a max capacity of 300. There are 2
+ways to gain meter: give or receive damage. Every time the PC engages
+in physical or ranged combat, the amount of damage given or received is
+added to the gauge. Only up to 40 meter can be added per combat
+engagement. No meter is added during engagements where the PC spends meter.
+Meter can be used to perform powerful special Hadoukens.
+
+
+**Added special ranged move: "Hadouken!".**
+Based on the Hadouken from the Street Fighter series. Special ranged attack.
+Use by pressing 'z', 'x', or 'c' in tile selector mode. The damage is
+calculated from the items in eq_slot_amulet, eq_slot_lhring, and
+eq_slot_rhring. Each Hadouken has different properties as follows:
+
+-'z': "Hadouken" Normal damage. Costs 0 meter. Builds meter as normal.
+PC shouts "Hadouken!" on use.
+
+-'x': "EX Hadouken" Increased damage. Costs 100 meter (one bar). Does not
+build meter. PC shouts "Strike!" on use. If the PC does not have enough
+meter, performs a regular Hadouken.
+
+-'c': "Shinku Hadouken" Greatly increase damage. Deals splash damage to
+monsters in 2 tile radius. Damage falls off with increasing distance.
+Costs 300 meter (3 bars. Meter will be highlited and show "CA" when Shinku
+Hadouken is available). Does not build meter. PC shouts "Shinku Hadouken!!!"
+on use.
+
+
+**Implemented PC equipment defence.**
+Armor damage scaling uses the knockback calculation algorithm from
+Super Smash Bros. Melee. It has been modified heavily to work with
+this game's variables and scale properly. The algorithm used can be
+found here:
 https://www.ssbwiki.com/Knockback#Melee_onward
+
+
+
+Compile command:
+        make rlg327
+
+Run command:
+        ./rlg327
+
+Clean command:
+        make clean
+	

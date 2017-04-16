@@ -16,6 +16,7 @@ class npc : public character {
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
   const char *description;
+  const char *get_description() { return description; }
 };
 
 # define NPC_SMART         0x00000001

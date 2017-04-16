@@ -6,6 +6,16 @@
 #include "pc.h"
 #include "dungeon.h"
 
+const char *character::get_name()
+{
+  return name;
+}
+
+int32_t character::get_speed()
+{
+  return speed;
+}
+
 void character_delete(character *c)
 {
   delete c;

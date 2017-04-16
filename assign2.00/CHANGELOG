@@ -84,12 +84,12 @@
 -Ranged combat
 -Tile selector/cursor
 -Equipment defence now reduces damage taken for PC
--Special meter
+-Special "Super Combo Gauge" meter
 -Ranged special attacks with meter
 
-
-
-
+#[2017-04-16]
+-Splash damage added for Shinku Hadouken
+-Tile selector can now inpsect monsters
 
 
 

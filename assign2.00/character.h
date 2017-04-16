@@ -7,6 +7,7 @@
 
 # include "dims.h"
 # include "utils.h"
+# include "dice.h"
 
 typedef enum kill_type {
   kill_direct,
@@ -38,6 +39,21 @@ class character {
   uint32_t kills[num_kill_types];
   uint32_t get_color() { return color[rand_range(0, color.size() - 1)]; }
   char get_symbol() { return symbol; }
+  const char *get_name();
+  int32_t get_speed();
+  inline int32_t get_damage_base() const
+  {
+    return damage->get_base();
+  }
+  inline int32_t get_damage_number() const
+  {
+    return damage->get_number();
+  }
+  inline int32_t get_damage_sides() const
+  {
+    return damage->get_sides();
+  }
+  
 };
 
 typedef struct dungeon dungeon_t;

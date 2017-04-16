@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "dungeon.h"
 #include "object.h"
+#include "npc.h"
 
 /* Same ugly hack we did in path.c */
 static dungeon_t *dungeon;
@@ -455,19 +456,19 @@ void io_display(dungeon_t *d)
     }
   }
   /* Print PC Health */
-  mvprintw(22, 0, "PC Health: ");
+  mvprintw(23, 0, "PC Health: ");
   attron(COLOR_PAIR(COLOR_YELLOW));
-  mvprintw(22, 11, "%i", d->PC->hp);
+  mvprintw(23, 11, "%i", d->PC->hp);
   attroff(COLOR_PAIR(COLOR_YELLOW));
   
   /* Print PC meter */
   uint32_t i, scaled_meter;
   
   attron(COLOR_PAIR(COLOR_BLUE));
-  mvprintw(22, 18, "EX: |     |     |     |");
+  mvprintw(23, 18, "EX: |     |     |     |");
   if(d->PC->meter == 300) {
     attron(COLOR_PAIR(COLOR_CYAN));
-    mvprintw(22, 18, "CA: |     |     |     |");
+    mvprintw(23, 18, "CA: |     |     |     |");
     attroff(COLOR_PAIR(COLOR_CYAN));
   }
   attroff(COLOR_PAIR(COLOR_BLUE));
@@ -488,7 +489,7 @@ void io_display(dungeon_t *d)
       attron(COLOR_PAIR(COLOR_CYAN));
     }
     attron(A_STANDOUT);
-    mvprintw(22, 23 + i, " ");
+    mvprintw(23, 23 + i, " ");
     if(d->PC->meter == 300) {
       attroff(COLOR_PAIR(COLOR_CYAN));
     }
@@ -497,7 +498,7 @@ void io_display(dungeon_t *d)
   }
   
   
-  mvprintw(23, 0, "PC position is (%3d,%2d); offset is (%3d,%2d).",
+  mvprintw(24, 0, "PC position is (%3d,%2d); offset is (%3d,%2d).",
            character_get_x(d->PC), character_get_y(d->PC),
            d->io_offset[dim_x], d->io_offset[dim_y]);
 
@@ -1203,6 +1204,53 @@ uint32_t io_expunge_in(dungeon_t *d)
   return 1;
 }
 
+void io_mon_to_string(character *o, char *s, uint32_t size)
+{
+  if (o) {
+    snprintf(s, size, "%s (sp: %d, dmg: %d+%dd%d)",
+	     o->get_name(), o->get_speed(), o->get_damage_base(),
+	     o->get_damage_number(), o->get_damage_sides());
+  } else {
+    *s = '\0';
+  }
+}
+
+static uint32_t io_display_mon_info(character *o)
+{
+  char s[80];
+  uint32_t i, l;
+  uint32_t n;
+  npc *mon;
+  mon = (npc *) o;
+  
+  for (i = 0; i < 79; i++) {
+    s[i] = ' ';
+  }
+  s[79] = '\0';
+
+  l = strlen(mon->get_description());
+  for (i = n = 0; i < l; i++) {
+    if (mon->get_description()[i] == '\n') {
+      n++;
+    }
+  }
+
+  for (i = 0; i < n + 4; i++) {
+    mvprintw(i, 0, s);
+  }
+
+  io_mon_to_string(o, s, 80);
+  mvprintw(1, 0, s);
+  mvprintw(3, 0, mon->get_description());
+
+  mvprintw(n + 5, 0, "Hit any key to continue.");
+
+  refresh();
+  getch();
+
+  return 0;
+}
+
 uint32_t io_select_tile(dungeon_t*d)
 {
   int32_t key;
@@ -1342,6 +1390,15 @@ uint32_t io_select_tile(dungeon_t*d)
 	fail_code = 1;
       }
       break;
+    case 'i':
+    case 'I':
+      if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
+	io_display_mon_info(charpair(d->cursor));
+      } else {
+	io_queue_message("No monster to inspect.");
+      }
+      fail_code = 1;
+      break;
     case 'x':	
       if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
 	if(d->PC->meter >= 100) { 
@@ -1358,7 +1415,57 @@ uint32_t io_select_tile(dungeon_t*d)
     case 'c':
       if(charpair(d->cursor) && charpair(d->cursor) != d->PC) {
 	if(d->PC->meter == 300) {
-	  do_special_combat(d, d->PC, charpair(d->cursor), 3);
+	  uint32_t i;
+	  pair_t order[25] = {
+	    {  0,  0 },
+	    { -1,  0 },
+	    { -1,  1 },
+	    {  0, -1 },
+	    { -1, -1 },
+	    {  0,  1 },
+	    {  1, -1 },
+	    {  1,  0 },
+	    {  1,  1 },
+	    { -2, -2 },
+	    { -2, -1 },
+	    { -2,  0 },
+	    { -2,  1 },
+	    { -2,  2 },
+	    { -1,  2 },
+	    {  0,  2 },
+	    {  1,  2 },
+	    {  2,  2 },
+	    {  2,  1 },
+	    {  2,  0 },
+	    {  2, -1 },
+	    {  2, -2 },
+	    {  1, -2 },
+	    {  0, -2 },
+	    { -1, -2 },
+	  };
+	  for (i = 0; i < 25; i++) {
+	    if(i == 0) {
+	      do_special_combat(d, d->PC, charpair(d->cursor), 3);
+	    }
+	    if(i > 0 && i < 9) {
+	      if(charxy(d->cursor[dim_x] + order[i][dim_x],
+			d->cursor[dim_y] + order[i][dim_y]) &&
+		 charxy(d->cursor[dim_x] + order[i][dim_x],
+			d->cursor[dim_y] + order[i][dim_y]) != d->PC) {
+		do_special_combat(d, d->PC, charxy(d->cursor[dim_x] + order[i][dim_x],
+						   d->cursor[dim_y] + order[i][dim_y]), 4);
+	      }
+	    }
+	    if(i > 9) {
+	      if(charxy(d->cursor[dim_x] + order[i][dim_x],
+			d->cursor[dim_y] + order[i][dim_y]) &&
+		 charxy(d->cursor[dim_x] + order[i][dim_x],
+			d->cursor[dim_y] + order[i][dim_y]) != d->PC) {
+		do_special_combat(d, d->PC, charxy(d->cursor[dim_x] + order[i][dim_x],
+						   d->cursor[dim_y] + order[i][dim_y]), 5);
+	      }
+	    }
+	  }
 	} else {
 	  do_special_combat(d, d->PC, charpair(d->cursor), 1);
 	}

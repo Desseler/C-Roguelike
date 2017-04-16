@@ -169,7 +169,9 @@ void do_ranged_combat(dungeon_t *d, character *atk, character *def)
  * 0 = NPC Hadouken/Special                                                           *
  * 1 = Regular Hadouken (Uses no meter)                                               *
  * 2 = EX Hadouken (Uses 1 meter. No meter build on hit)                              *
- * 3 = Shinku Hadouken (Uses 3 meter. No meter build on hit. Inflicts splash damage)  */
+ * 3 = Shinku Hadouken (Uses 3 meter. No meter build on hit. Inflicts splash damage)  *
+ * 4 = Splash damage from Shinku Hadouken (1/4 damage)                                *
+ * 5 = Splash damage from Shinku Hadouken (1/8 damage)                                */
 void do_special_combat(dungeon_t *d, character *atk, character *def, uint32_t special_level)
 {
   uint32_t damage, meter_damage, i;
@@ -219,8 +221,15 @@ void do_special_combat(dungeon_t *d, character *atk, character *def, uint32_t sp
 	d->PC->meter = 0;
 	io_queue_message("Shinku Hadouken!!!");
       }
+      if (special_level == 4) {
+	damage += 3000;
+	damage = damage/5;
+      }
+      if (special_level == 5) {
+	damage += 3000;
+	damage = damage/12;
+      }
       io_queue_message("You shoot the %s for %d.", def->name, damage);
-      io_queue_message("");
     }
     if (damage >= def->hp) {
       if (atk != d->PC) {
